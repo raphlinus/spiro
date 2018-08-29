@@ -36,7 +36,7 @@ void bezctx_quadto(bezctx *bc, double x1, double y1, double x2, double y2)
 }
 
 void bezctx_curveto(bezctx *bc, double x1, double y1, double x2, double y2,
-		    double x3, double y3)
+                    double x3, double y3)
 {
     bc->curveto(bc, x1, y1, x2, y2, x3, y3);
 }
@@ -44,5 +44,5 @@ void bezctx_curveto(bezctx *bc, double x1, double y1, double x2, double y2,
 void bezctx_mark_knot(bezctx *bc, int knot_idx)
 {
     if (bc->mark_knot)
-	bc->mark_knot(bc, knot_idx);
+        bc->mark_knot(bc, knot_idx);
 }

@@ -5,10 +5,10 @@
 
 int
 mycallback(x3widget *w, void *data,
-	   char *cmd, char *what, char *arg, void *more)
+           char *cmd, char *what, char *arg, void *more)
 {
     printf("my callback: cmd=\"%s\", what=\"%s\", arg=\"%s\"\n",
-	   cmd, what ? what : "(null)", arg ? arg : "(null)");
+           cmd, what ? what : "(null)", arg ? arg : "(null)");
     return 1;
 }
 
@@ -16,43 +16,43 @@ mycallback(x3widget *w, void *data,
 static void test_viewclient_draw(x3viewclient *self, x3dc *dc)
 {
     if (dc->buf) {
-	int i, j;
+        int i, j;
 
-	for (i = 0; i < dc->height; i++) {
-	    for (j = 0; j < dc->width; j++) {
-		dc->buf[i * dc->rowstride + j * 3] = i;
-		dc->buf[i * dc->rowstride + j * 3 + 1] = 0x80;
-		dc->buf[i * dc->rowstride + j * 3 + 2] = j;
-	    }
-	}
+        for (i = 0; i < dc->height; i++) {
+            for (j = 0; j < dc->width; j++) {
+                dc->buf[i * dc->rowstride + j * 3] = i;
+                dc->buf[i * dc->rowstride + j * 3 + 1] = 0x80;
+                dc->buf[i * dc->rowstride + j * 3 + 2] = j;
+            }
+        }
     } else {
-	x3extents ext;
+        x3extents ext;
 
-	x3moveto(dc, 10, 10);
-	x3curveto(dc, 200, 10, 100, 100, 490, 100);
-	x3stroke(dc);
-	x3selectfont(dc, "Nimbus Roman No9 L", 0, 0);
-	x3moveto(dc, 10, 50);
-	x3setfontsize(dc, 16);
-	x3showtext(dc, "hello, world!");
-	x3textextents(dc, "hello, world!", &ext);
-	printf("text extents: %g %g %g %g %g %g\n",
-	       ext.x_bearing, ext.y_bearing,
-	       ext.width, ext.height,
-	       ext.x_advance, ext.y_advance);
+        x3moveto(dc, 10, 10);
+        x3curveto(dc, 200, 10, 100, 100, 490, 100);
+        x3stroke(dc);
+        x3selectfont(dc, "Nimbus Roman No9 L", 0, 0);
+        x3moveto(dc, 10, 50);
+        x3setfontsize(dc, 16);
+        x3showtext(dc, "hello, world!");
+        x3textextents(dc, "hello, world!", &ext);
+        printf("text extents: %g %g %g %g %g %g\n",
+               ext.x_bearing, ext.y_bearing,
+               ext.width, ext.height,
+               ext.x_advance, ext.y_advance);
     }
 }
 
 static int test_viewclient_key(x3viewclient *self,
-				char *keyname, int mods, int key)
+                                char *keyname, int mods, int key)
 {
     printf("view key: %s %d %d\n", keyname, mods, key);
     return 1;
 }
 
 static void test_viewclient_mouse(x3viewclient *self,
-				  int button, int mods,
-				  double x, double y)
+                                  int button, int mods,
+                                  double x, double y)
 {
     printf("view button: %d %d %g %g\n", button, mods, x, y);
 }
@@ -92,21 +92,21 @@ main(int argc, char **argv)
     x3menuitem(m, "ctrl-delete", "cdel", "<ctl>Delete");
     x3menuitem(m, "ctrl-f1", "cf1", "<ctl>F1");
     if (0) {
-	int i, j;
+        int i, j;
 
-	for (j = 0; j < 3; j++) {
-	    char mname[16];
-	    mname[0] = '0' + j;
-	    mname[1] = 0;
-	    m = x3menu(mainwin, mname);
-	    for (i = 0x20 + 0x20 * j; i < 0x40 + 0x20 * j; i++) {
-		char name[16];
+        for (j = 0; j < 3; j++) {
+            char mname[16];
+            mname[0] = '0' + j;
+            mname[1] = 0;
+            m = x3menu(mainwin, mname);
+            for (i = 0x20 + 0x20 * j; i < 0x40 + 0x20 * j; i++) {
+                char name[16];
 
-		name[0] = i;
-		name[1] = 0;
-		x3menuitem(m, name, name, name);
-	    }
-	}
+                name[0] = i;
+                name[1] = 0;
+                x3menuitem(m, name, name, name);
+            }
+        }
     }
 #endif
 
@@ -139,7 +139,7 @@ main(int argc, char **argv)
 
 #ifdef X3_USEWINMAIN
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
-		   int iCmdShow)
+                   int iCmdShow)
 {
     //printf("winmain\n");
     x3widget *mainwin;

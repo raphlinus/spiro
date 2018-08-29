@@ -83,7 +83,7 @@ bezctx_ps_quadto(bezctx *z, double xm, double ym, double x3, double y3)
 
 void
 bezctx_ps_curveto(bezctx *z, double x1, double y1, double x2, double y2,
-		  double x3, double y3)
+                  double x3, double y3)
 {
     bezctx_ps *bc = (bezctx_ps *)z;
 

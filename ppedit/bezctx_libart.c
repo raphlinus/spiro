@@ -36,7 +36,7 @@ bezctx_libart_moveto(bezctx *z, double x, double y, int is_open) {
     ArtBpath *bp;
 
     if (bc->n_bez == bc->n_bez_max) {
-	bc->bez = zrenew(ArtBpath, bc->bez, bc->n_bez_max <<= 1);
+        bc->bez = zrenew(ArtBpath, bc->bez, bc->n_bez_max <<= 1);
     }
     bp = &bc->bez[bc->n_bez++];
     bp->code = is_open ? ART_MOVETO_OPEN : ART_MOVETO;
@@ -50,7 +50,7 @@ bezctx_libart_lineto(bezctx *z, double x, double y) {
     ArtBpath *bp;
 
     if (bc->n_bez == bc->n_bez_max) {
-	bc->bez = zrenew(ArtBpath, bc->bez, bc->n_bez_max <<= 1);
+        bc->bez = zrenew(ArtBpath, bc->bez, bc->n_bez_max <<= 1);
     }
     bp = &bc->bez[bc->n_bez++];
     bp->code = ART_LINETO;
@@ -66,7 +66,7 @@ bezctx_libart_quadto(bezctx *z, double x1, double y1, double x2, double y2)
     double x0, y0;
 
     if (bc->n_bez == bc->n_bez_max) {
-	bc->bez = zrenew(ArtBpath, bc->bez, bc->n_bez_max <<= 1);
+        bc->bez = zrenew(ArtBpath, bc->bez, bc->n_bez_max <<= 1);
     }
     bp = &bc->bez[bc->n_bez++];
     x0 = bp[-1].x3;
@@ -82,13 +82,13 @@ bezctx_libart_quadto(bezctx *z, double x1, double y1, double x2, double y2)
 
 void
 bezctx_libart_curveto(bezctx *z, double x1, double y1, double x2, double y2,
-		      double x3, double y3)
+                      double x3, double y3)
 {
     bezctx_libart *bc = (bezctx_libart *)z;
     ArtBpath *bp;
 
     if (bc->n_bez == bc->n_bez_max) {
-	bc->bez = zrenew(ArtBpath, bc->bez, bc->n_bez_max <<= 1);
+        bc->bez = zrenew(ArtBpath, bc->bez, bc->n_bez_max <<= 1);
     }
     bp = &bc->bez[bc->n_bez++];
     bp->code = ART_CURVETO;
@@ -106,7 +106,7 @@ bezctx_to_bpath(bezctx *z) {
     ArtBpath *result;
 
     if (bc->n_bez == bc->n_bez_max) {
-	bc->bez = zrenew(ArtBpath, bc->bez, bc->n_bez_max <<= 1);
+        bc->bez = zrenew(ArtBpath, bc->bez, bc->n_bez_max <<= 1);
     }
     bc->bez[bc->n_bez].code = ART_END;
     result = bc->bez;

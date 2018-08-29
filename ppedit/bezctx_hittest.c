@@ -59,14 +59,14 @@ bezctx_hittest_lineto(bezctx *z, double x, double y) {
     if (r < r_min) r_min = r;
 
     if (dotp >= 0 && dotp <= lin_dotp) {
-	double norm = (bc->x - x0) * dy - (bc->y - y0) * dx;
-	r = fabs(norm / sqrt(lin_dotp));
-	if (r < r_min) r_min = r;
+        double norm = (bc->x - x0) * dy - (bc->y - y0) * dx;
+        r = fabs(norm / sqrt(lin_dotp));
+        if (r < r_min) r_min = r;
     }
 
     if (r_min < bc->r_min) {
-	bc->r_min = r_min;
-	bc->knot_idx_min = bc->knot_idx;
+        bc->r_min = r_min;
+        bc->knot_idx_min = bc->knot_idx;
     }
 
     bc->x0 = x;
@@ -79,9 +79,9 @@ static double
 my_cbrt(double x)
 {
     if (x >= 0)
-	return pow(x, 1.0 / 3.0);
+        return pow(x, 1.0 / 3.0);
     else
-	return -pow(-x, 1.0 / 3.0);
+        return -pow(-x, 1.0 / 3.0);
 }
 
 /**
@@ -103,14 +103,14 @@ solve_cubic(double c0, double c1, double c2, double c3, double root[3])
     if (Q > 0) {
         double sQ = sqrt(Q);
         double t1 = my_cbrt(-b/2 + sQ) + my_cbrt(-b/2 - sQ);
-	root[0] = t1 - x0;
+        root[0] = t1 - x0;
         return 1;
     } else if (Q == 0) {
         double t1 = my_cbrt(b / 2);
         double x1 = t1 - x0;
-	root[0] = x1;
-	root[1] = x1;
-	root[2] = -2 * t1 - x0;
+        root[0] = x1;
+        root[1] = x1;
+        root[2] = -2 * t1 - x0;
         return 3;
     } else {
         double sQ = sqrt(-Q);
@@ -119,20 +119,20 @@ solve_cubic(double c0, double c1, double c2, double c3, double root[3])
         double cbrho = my_cbrt(rho);
         double c = cos(th / 3);
         double s = sin(th / 3);
-	double sqr3 = sqrt(3);
-	root[0] = 2 * cbrho * c - x0;
-	root[1] = -cbrho * (c + sqr3 * s) - x0;
-	root[2] = -cbrho * (c - sqr3 * s) - x0;
-	return 3;
+        double sqr3 = sqrt(3);
+        root[0] = 2 * cbrho * c - x0;
+        root[1] = -cbrho * (c + sqr3 * s) - x0;
+        root[2] = -cbrho * (c - sqr3 * s) - x0;
+        return 3;
     }
 }
 
 
 static double
 dist_to_quadratic(double x, double y,
-		  double x0, double y0,
-		  double x1, double y1,
-		  double x2, double y2)
+                  double x0, double y0,
+                  double x1, double y1,
+                  double x2, double y2)
 {
     double u0, u1, t0, t1, t2, c0, c1, c2, c3;
     double roots[3];
@@ -165,22 +165,22 @@ dist_to_quadratic(double x, double y,
     n_roots = solve_cubic(c0, c1, c2, c3, roots);
     n_ts = 0;
     for (i = 0; i < n_roots; i++) {
-	double t = roots[i];
-	if (t > 0 && t < 1)
-	    ts[n_ts++] = t;
+        double t = roots[i];
+        if (t > 0 && t < 1)
+            ts[n_ts++] = t;
     }
     if (n_ts < n_roots) {
-	ts[n_ts++] = 0;
-	ts[n_ts++] = 1;
+        ts[n_ts++] = 0;
+        ts[n_ts++] = 1;
     }
     for (i = 0; i < n_ts; i++) {
         double t = ts[i];
-	double xa = x0 * (1 - t) * (1 - t) + 2 * x1 * (1 - t) * t + x2 * t * t;
-	double ya = y0 * (1 - t) * (1 - t) + 2 * y1 * (1 - t) * t + y2 * t * t;
-	double err = hypot(xa - x, ya - y);
-	if (i == 0 || err < minerr) {
-	    minerr = err;
-	}
+        double xa = x0 * (1 - t) * (1 - t) + 2 * x1 * (1 - t) * t + x2 * t * t;
+        double ya = y0 * (1 - t) * (1 - t) + 2 * y1 * (1 - t) * t + y2 * t * t;
+        double err = hypot(xa - x, ya - y);
+        if (i == 0 || err < minerr) {
+            minerr = err;
+        }
     }
     return minerr;
 }
@@ -190,11 +190,11 @@ bezctx_hittest_quadto(bezctx *z, double x1, double y1, double x2, double y2)
 {
     bezctx_hittest *bc = (bezctx_hittest *)z;
     double r = dist_to_quadratic(bc->x, bc->y,
-				 bc->x0, bc->y0, x1, y1, x2, y2);
+                                 bc->x0, bc->y0, x1, y1, x2, y2);
 
     if (r < bc->r_min) {
-	bc->r_min = r;
-	bc->knot_idx_min = bc->knot_idx;
+        bc->r_min = r;
+        bc->knot_idx_min = bc->knot_idx;
     }
     bc->x0 = x2;
     bc->y0 = y2;
@@ -202,7 +202,7 @@ bezctx_hittest_quadto(bezctx *z, double x1, double y1, double x2, double y2)
 
 static void
 bezctx_hittest_curveto(bezctx *z, double x1, double y1, double x2, double y2,
-		       double x3, double y3)
+                       double x3, double y3)
 {
     bezctx_hittest *bc = (bezctx_hittest *)z;
     double x0 = bc->x0;
@@ -213,14 +213,14 @@ bezctx_hittest_curveto(bezctx *z, double x1, double y1, double x2, double y2,
 
     /* todo: subdivide to quadratics rather than lines */
     for (i = 0; i < n_subdiv; i++) {
-	double t = (1. / n_subdiv) * (i + 1);
-	double mt = 1 - t;
+        double t = (1. / n_subdiv) * (i + 1);
+        double mt = 1 - t;
 
-	xq2 = x0 * mt * mt * mt + 3 * x1 * mt * t * t + 3 * x2 * mt * mt * t +
-	    x3 * t * t * t;
-	yq2 = y0 * mt * mt * mt + 3 * y1 * mt * t * t + 3 * y2 * mt * mt * t +
-	    y3 * t * t * t;
-	bezctx_hittest_lineto(z, xq2, yq2);
+        xq2 = x0 * mt * mt * mt + 3 * x1 * mt * t * t + 3 * x2 * mt * mt * t +
+            x3 * t * t * t;
+        yq2 = y0 * mt * mt * mt + 3 * y1 * mt * t * t + 3 * y2 * mt * mt * t +
+            y3 * t * t * t;
+        bezctx_hittest_lineto(z, xq2, yq2);
     }
 }
 
@@ -254,7 +254,7 @@ bezctx_hittest_report(bezctx *z, int *p_knot_idx)
     double r_min = bc->r_min;
 
     if (p_knot_idx)
-	*p_knot_idx = bc->knot_idx_min;
+        *p_knot_idx = bc->knot_idx_min;
 
     zfree(z);
     return r_min;

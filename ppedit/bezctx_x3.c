@@ -53,17 +53,17 @@ bezctx_x3_quadto(bezctx *z, double x1, double y1, double x2, double y2)
 
     x3getcurrentpoint(bc->dc, &x0, &y0);
     x3curveto(bc->dc,
-		  x1 + (1./3) * (x0 - x1),
-		  y1 + (1./3) * (y0 - y1),
-		  x1 + (1./3) * (x2 - x1),
-		  y1 + (1./3) * (y2 - y1),
-		  x2,
-		  y2);
+                  x1 + (1./3) * (x0 - x1),
+                  y1 + (1./3) * (y0 - y1),
+                  x1 + (1./3) * (x2 - x1),
+                  y1 + (1./3) * (y2 - y1),
+                  x2,
+                  y2);
 }
 
 void
 bezctx_x3_curveto(bezctx *z, double x1, double y1, double x2, double y2,
-		      double x3, double y3)
+                      double x3, double y3)
 {
     bezctx_x3 *bc = (bezctx_x3 *)z;
 
@@ -76,7 +76,7 @@ bezctx_x3_finish(bezctx *z)
     bezctx_x3 *bc = (bezctx_x3 *)z;
 
     if (!bc->is_open)
-	x3closepath(bc->dc);
+        x3closepath(bc->dc);
 
     zfree(bc);
 }

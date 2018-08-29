@@ -17,9 +17,9 @@ UInt32 x3mkmultichar(const char *s)
     UInt32 result = 0;
 
     for (i = 0; i < (len > 4 ? 4 : len); i++)
-	result = (result << 8) + (unsigned char)s[i];
+        result = (result << 8) + (unsigned char)s[i];
     for (; i < 4; i++)
-	result = (result << 8) + ' ';
+        result = (result << 8) + ' ';
     return result;
 }
 
@@ -28,10 +28,10 @@ char *x3multicharstr(UInt32 mc, char buf[5])
     int i, len;
 
     for (i = 0; i < 4; i++)
-	if (((mc >> (8 * i)) & 0xff) != ' ') break;
+        if (((mc >> (8 * i)) & 0xff) != ' ') break;
     len = 4 - i;
     for (i = 0; i < len; i++)
-	buf[i] = (mc >> (24 - 8 * i)) & 0xff;
+        buf[i] = (mc >> (24 - 8 * i)) & 0xff;
     buf[len] = 0;
     return buf;
 }
@@ -48,7 +48,7 @@ void x3widget_init(x3widget *w, const x3type *type)
 }
 
 static x3widget *x3widget_new_container(x3widget *parent, char *name,
-					const x3type *type)
+                                        const x3type *type)
 {
     x3widget *result = (x3widget *)malloc(sizeof(x3widget));
     x3widget_init(result, type);
@@ -59,8 +59,8 @@ static x3widget *x3widget_new_container(x3widget *parent, char *name,
 }
 
 static x3widget *x3widget_new_hiview(x3widget *parent, char *name,
-				     const x3type *type,
-				     HIViewRef hiview)
+                                     const x3type *type,
+                                     HIViewRef hiview)
 {
     x3widget *result = (x3widget *)malloc(sizeof(x3widget));
     x3widget_init(result, type);
@@ -73,8 +73,8 @@ static x3widget *x3widget_new_hiview(x3widget *parent, char *name,
 }
 
 static x3widget *x3widget_new_menu(x3widget *parent,
-				     const x3type *type,
-				     MenuRef menu)
+                                     const x3type *type,
+                                     MenuRef menu)
 {
     x3widget *result = (x3widget *)malloc(sizeof(x3widget));
     x3widget_init(result, type);
@@ -85,7 +85,7 @@ static x3widget *x3widget_new_menu(x3widget *parent,
 }
 
 static x3widget *x3widget_new_menuitem(x3widget *parent,
-					const x3type *type, int index)
+                                        const x3type *type, int index)
 {
     x3widget *result = (x3widget *)malloc(sizeof(x3widget));
     x3widget_init(result, type);
@@ -120,7 +120,7 @@ void x3_window_show(x3widget *mainwin)
     ControlRef root;
 #if 0
     TransitionWindow(mainwin->u.window, kWindowZoomTransitionEffect,
-		     kWindowShowTransitionAction, NULL);
+                     kWindowShowTransitionAction, NULL);
 #endif
 
 #if 0
@@ -144,7 +144,7 @@ typedef struct {
 } x3widget_window;
 
 pascal OSStatus x3carbonWindowEventHandler(EventHandlerCallRef cr,
-					   EventRef inEvent, void *data)
+                                           EventRef inEvent, void *data)
 {
     x3widget_window *z = (x3widget_window *)data;
     OSStatus result = noErr;
@@ -153,24 +153,24 @@ pascal OSStatus x3carbonWindowEventHandler(EventHandlerCallRef cr,
     char multicharbuf[5];
 
     if (eclass == kEventClassCommand && ekind == kEventCommandProcess) {
-	HICommand command;
-	int status;
+        HICommand command;
+        int status;
 
-	GetEventParameter(inEvent, kEventParamDirectObject, typeHICommand,
-			  NULL, sizeof(HICommand), NULL, &command);
-	status = z->callback(&z->base, z->callback_data,
-			     x3multicharstr(command.commandID, multicharbuf),
-			     "command", NULL, NULL);
-	if (status == 1)
-	    result = eventNotHandledErr;
+        GetEventParameter(inEvent, kEventParamDirectObject, typeHICommand,
+                          NULL, sizeof(HICommand), NULL, &command);
+        status = z->callback(&z->base, z->callback_data,
+                             x3multicharstr(command.commandID, multicharbuf),
+                             "command", NULL, NULL);
+        if (status == 1)
+            result = eventNotHandledErr;
     } else if (eclass = kEventClassWindow && ekind == kEventWindowBoundsChanged) {
-	/* todo: only queue size request when size changes, not just pos */
-	x3qsizereq(&z->base);
-	x3sync();
+        /* todo: only queue size request when size changes, not just pos */
+        x3qsizereq(&z->base);
+        x3sync();
     } else {
-	printf("My handler is getting called %s %d!\n",
-	       x3multicharstr(eclass, multicharbuf),
-	       GetEventKind(inEvent));
+        printf("My handler is getting called %s %d!\n",
+               x3multicharstr(eclass, multicharbuf),
+               GetEventKind(inEvent));
     }
     result = eventNotHandledErr;
     return result;
@@ -192,52 +192,52 @@ void x3window_sizealloc(x3widget *w, x3rect *r)
     child_r.y0 = 0;
     child_r.y1 = bounds.bottom - bounds.top;
     printf("x3window_sizealloc (%d, %d) - (%d, %d)\n",
-	   bounds.left, bounds.top, bounds.right, bounds.bottom);
+           bounds.left, bounds.top, bounds.right, bounds.bottom);
     for (i = 0; i < w->n_children; i++) {
-	x3widget *child = w->children[i];
-	if (child->type->sizealloc)
-	    child->type->sizealloc(child, &child_r);
-	child->flags &= ~x3flag_needsizealloc;
+        x3widget *child = w->children[i];
+        if (child->type->sizealloc)
+            child->type->sizealloc(child, &child_r);
+        child->flags &= ~x3flag_needsizealloc;
     }
 }
 
 x3type x3windowtype = { x3window_sizereq,
-			x3window_sizealloc,
-			x3add_default };
+                        x3window_sizealloc,
+                        x3add_default };
 
 x3widget *x3window(x3windowflags flags, char *label,
-		   x3window_callback callback, void *data)
+                   x3window_callback callback, void *data)
 {
     WindowRef window;
     Rect bounds = { 100, 100, 400, 600 };
     EventHandlerRef handlerRef;
     WindowAttributes attrs =
-	kWindowCompositingAttribute |
-	kWindowLiveResizeAttribute |
-	kWindowInWindowMenuAttribute |
-	kWindowFrameworkScaledAttribute |
-	kWindowStandardHandlerAttribute;
+        kWindowCompositingAttribute |
+        kWindowLiveResizeAttribute |
+        kWindowInWindowMenuAttribute |
+        kWindowFrameworkScaledAttribute |
+        kWindowStandardHandlerAttribute;
     EventTypeSpec windowEvents[] = {
-		{ kEventClassCommand,	kEventCommandProcess }, 
-		//{ kEventClassCommand,	kEventCommandUpdateStatus }, 
+                { kEventClassCommand,   kEventCommandProcess }, 
+                //{ kEventClassCommand, kEventCommandUpdateStatus }, 
 
-		//{ kEventClassMouse,	kEventMouseDown },
+                //{ kEventClassMouse,   kEventMouseDown },
 
-		//{ kEventClassWindow,	kEventWindowClose }, 
-		//{ kEventClassWindow,	kEventWindowGetIdealSize },
-		{ kEventClassWindow,	kEventWindowBoundsChanged }, 
-		//{ kEventClassWindow,	kEventWindowGetClickActivation }, 
-		//{ kEventClassWindow,	kEventWindowContextualMenuSelect } 
-	};
+                //{ kEventClassWindow,  kEventWindowClose }, 
+                //{ kEventClassWindow,  kEventWindowGetIdealSize },
+                { kEventClassWindow,    kEventWindowBoundsChanged }, 
+                //{ kEventClassWindow,  kEventWindowGetClickActivation }, 
+                //{ kEventClassWindow,  kEventWindowContextualMenuSelect } 
+        };
     CFStringRef cflabel = CFStringCreateWithCString(NULL, label,
-						    kCFStringEncodingUTF8);
+                                                    kCFStringEncodingUTF8);
     x3widget *result = (x3widget *)malloc(sizeof(x3widget_window));
 
     if (flags & x3window_main)
-	attrs |= kWindowStandardDocumentAttributes;
+        attrs |= kWindowStandardDocumentAttributes;
 
     OSStatus err = CreateNewWindow(kDocumentWindowClass, attrs,
-				   &bounds, &window);
+                                   &bounds, &window);
 
     SetWindowTitleWithCFString(window, cflabel);
     CFRelease(cflabel);
@@ -248,8 +248,8 @@ x3widget *x3window(x3windowflags flags, char *label,
     ((x3widget_window *)result)->callback_data = data;
 
     InstallWindowEventHandler(window, NewEventHandlerUPP(x3carbonWindowEventHandler),
-			      sizeof(windowEvents)/sizeof(EventTypeSpec),
-			      windowEvents, result, &handlerRef);
+                              sizeof(windowEvents)/sizeof(EventTypeSpec),
+                              windowEvents, result, &handlerRef);
 
     x3qshow(result);
     return result;
@@ -262,7 +262,7 @@ x3widget *x3menu(x3widget *parent, char *name)
     static int id = 1; /* Note: menu id should probably be kept per-window */
     MenuRef menu;
     CFStringRef cflabel = CFStringCreateWithCString(NULL, name,
-						    kCFStringEncodingUTF8);
+                                                    kCFStringEncodingUTF8);
 
     CreateNewMenu(id++, 0, &menu);
     SetMenuTitleWithCFString(menu, cflabel);
@@ -278,27 +278,27 @@ int x3parseshortcut(const char *shortcut, UInt16 *pkey, UInt8 *pmods)
     int i = 0;
 
     while (shortcut[i] == '<') {
-	if (!strncmp(shortcut + i, "<cmd>", 5)) {
-	    mods &= ~kMenuNoCommandModifier;
-	    i += 5;
-	} else if (!strncmp(shortcut + i, "<shift>", 7)) {
-	    mods |= kMenuShiftModifier;
-	    i += 7;
-	} else if (!strncmp(shortcut + i, "<option>", 8)) {
-	    mods |= kMenuOptionModifier;
-	    i += 8;
-	} else if (!strncmp(shortcut + i, "<ctrl>", 6)) {
-	    mods |= kMenuControlModifier;
-	    i += 6;
-	} else
-	    return false;
+        if (!strncmp(shortcut + i, "<cmd>", 5)) {
+            mods &= ~kMenuNoCommandModifier;
+            i += 5;
+        } else if (!strncmp(shortcut + i, "<shift>", 7)) {
+            mods |= kMenuShiftModifier;
+            i += 7;
+        } else if (!strncmp(shortcut + i, "<option>", 8)) {
+            mods |= kMenuOptionModifier;
+            i += 8;
+        } else if (!strncmp(shortcut + i, "<ctrl>", 6)) {
+            mods |= kMenuControlModifier;
+            i += 6;
+        } else
+            return false;
     }
     if (shortcut[i] && shortcut[i + 1] == 0) {
-	key = shortcut[i];
-	if (key >= 'a' && key <= 'z') key -= 'a' - 'A';
-	else if (key >= 'A' && key <= 'Z') mods |= kMenuShiftModifier;
+        key = shortcut[i];
+        if (key >= 'a' && key <= 'z') key -= 'a' - 'A';
+        else if (key >= 'A' && key <= 'Z') mods |= kMenuShiftModifier;
     } else
-	return false;
+        return false;
 
     *pkey = key;
     *pmods = mods;
@@ -310,20 +310,20 @@ x3type x3menuitemtype = { NULL, NULL, x3add_default };
 x3widget *x3menuitem(x3widget *parent, char *name, char *cmd, char *shortcut)
 {
     CFStringRef cflabel = CFStringCreateWithCString(NULL, name,
-						    kCFStringEncodingUTF8);
+                                                    kCFStringEncodingUTF8);
     MenuItemIndex index;
 
     AppendMenuItemTextWithCFString(parent->u.menu, cflabel,
-				   0,
-				   x3mkmultichar(cmd), &index);
+                                   0,
+                                   x3mkmultichar(cmd), &index);
     if (shortcut) {
-	UInt16 key;
-	UInt8 mods;
+        UInt16 key;
+        UInt8 mods;
 
-	if (x3parseshortcut(shortcut, &key, &mods)) {
-	    SetMenuItemCommandKey(parent->u.menu, index, false, key);
-	    SetMenuItemModifiers(parent->u.menu, index, mods);
-	}
+        if (x3parseshortcut(shortcut, &key, &mods)) {
+            SetMenuItemCommandKey(parent->u.menu, index, false, key);
+            SetMenuItemModifiers(parent->u.menu, index, mods);
+        }
     }
     CFRelease(cflabel);
     return x3widget_new_menuitem(parent, &x3menuitemtype, index);
@@ -349,8 +349,8 @@ void x3button_sizereq(x3widget *w)
     w->sizerequest.y1 = r.bottom;
 #ifdef VERBOSE
     printf("button sizereq = (%g, %g) - (%g, %g)\n",
-	   w->sizerequest.x0, w->sizerequest.y0,
-	   w->sizerequest.x1, w->sizerequest.y1);
+           w->sizerequest.x0, w->sizerequest.y0,
+           w->sizerequest.x1, w->sizerequest.y1);
 #endif
 }
 
@@ -364,13 +364,13 @@ void x3button_sizealloc(x3widget *w, x3rect *r)
     bounds.bottom = r->y1;
     /* TODO probably want to use HIViewSetFrame instead */
     printf("button sizealloc = (%g, %g) - (%g, %g)\n",
-	   r->x0, r->y0, r->x1, r->y1);
+           r->x0, r->y0, r->x1, r->y1);
     SetControlBounds(w->u.hiview, &bounds);
 }
 
 x3type x3buttontype = { x3button_sizereq,
-			x3button_sizealloc,
-			x3add_default };
+                        x3button_sizealloc,
+                        x3add_default };
 
 x3widget *x3button(x3widget *parent, char *cmd, char *label)
 {
@@ -379,7 +379,7 @@ x3widget *x3button(x3widget *parent, char *cmd, char *label)
     ControlRef control;
     OSStatus err;
     CFStringRef cflabel = CFStringCreateWithCString(NULL, label,
-						    kCFStringEncodingUTF8);
+                                                    kCFStringEncodingUTF8);
 
     err = CreatePushButtonControl(window, &r, cflabel, &control);
     CFRelease(cflabel);
@@ -396,15 +396,15 @@ x3widget *x3label(x3widget *parent, char *text)
     OSStatus err;
     Boolean singleline = true;
     CFStringRef cftext = CFStringCreateWithCString(NULL, text,
-						    kCFStringEncodingUTF8);
+                                                    kCFStringEncodingUTF8);
 
     err = CreateStaticTextControl(window, &r, cftext,
-				  NULL, &control);
+                                  NULL, &control);
     CFRelease(cftext);
 #if 0
     SetControlData(control, kControlEntireControl,
-		   kControlEditTextSingleLineTag, sizeof(Boolean),
-		   &singleline);
+                   kControlEditTextSingleLineTag, sizeof(Boolean),
+                   &singleline);
 #endif
     return x3widget_new_hiview(parent, NULL, &x3buttontype, control);
 }
@@ -418,12 +418,12 @@ x3widget *x3edittext(x3widget *parent, char *cmd)
     Boolean singleline = true;
 
     err = CreateEditUnicodeTextControl(window, &r, CFSTR(""),
-				  false, NULL, &control);
+                                  false, NULL, &control);
     SetControlCommandID(control, x3mkmultichar(cmd));
 #if 0
     SetControlData(control, kControlEntireControl,
-		   kControlEditTextSingleLineTag, sizeof(Boolean),
-		   &singleline);
+                   kControlEditTextSingleLineTag, sizeof(Boolean),
+                   &singleline);
 #endif
     return x3widget_new_hiview(parent, cmd, &x3buttontype, control);
 }
@@ -454,17 +454,17 @@ x3view_construct(EventRef inEvent)
     data = (x3view_data *)malloc(sizeof(x3view_data));
     require_action(data != NULL, CantMalloc, err = memFullErr);
     err = GetEventParameter(inEvent, kEventParamHIObjectInstance,
-			    typeHIObjectRef, NULL, sizeof(HIObjectRef), NULL,
-			    (HIObjectRef *)&data->view);
+                            typeHIObjectRef, NULL, sizeof(HIObjectRef), NULL,
+                            (HIObjectRef *)&data->view);
     require_noerr(err, ParameterMissing);
     err = SetEventParameter(inEvent, kEventParamHIObjectInstance,
-			    typeVoidPtr, sizeof(x3view_data *), &data);
+                            typeVoidPtr, sizeof(x3view_data *), &data);
 
     data->vc = NULL;
 
  ParameterMissing:
     if (err != noErr)
-	free(data);
+        free(data);
 
  CantMalloc:
     return err;
@@ -479,7 +479,7 @@ x3view_destruct(EventRef inEvent, x3view_data *inData)
 
 static OSStatus
 x3view_initialize(EventHandlerCallRef inCallRef, EventRef inEvent,
-		  x3view_data *inData)
+                  x3view_data *inData)
 {
     OSStatus err;
     HIRect bounds;
@@ -488,7 +488,7 @@ x3view_initialize(EventHandlerCallRef inCallRef, EventRef inEvent,
     require_noerr(err, TroubleInSuperClass);
 
     err = GetEventParameter(inEvent, 'Boun', typeHIRect,
-			    NULL, sizeof(HIRect), NULL, &bounds);
+                            NULL, sizeof(HIRect), NULL, &bounds);
     require_noerr(err, ParameterMissing);
 
     HIViewSetFrame(inData->view, &bounds);
@@ -505,7 +505,7 @@ x3view_draw(EventRef inEvent, x3view_data *inData)
     CGContextRef ctx;
 
     err = GetEventParameter(inEvent, kEventParamCGContextRef, typeCGContextRef,
-			    NULL, sizeof(CGContextRef), NULL, &ctx);
+                            NULL, sizeof(CGContextRef), NULL, &ctx);
     require_noerr(err, ParameterMissing);
 
 #ifdef VERBOSE
@@ -513,21 +513,21 @@ x3view_draw(EventRef inEvent, x3view_data *inData)
 #endif
 
     if (inData->vc && inData->vc->draw) {
-	x3dc dc;
+        x3dc dc;
 
-	/* set up bounds */
-	if (inData->flags & x3view_2d) {
-	    dc.ctx = ctx;
-	    dc.path = NULL;
-	    dc.buf = NULL;
+        /* set up bounds */
+        if (inData->flags & x3view_2d) {
+            dc.ctx = ctx;
+            dc.path = NULL;
+            dc.buf = NULL;
 
-	    inData->vc->draw(inData->vc, &dc);
-	    if (dc.path) {
-		CGPathRelease(dc.path);
-	    }
-	} else if (inData->flags & x3view_rgb) {
-	    /* todo */
-	}
+            inData->vc->draw(inData->vc, &dc);
+            if (dc.path) {
+                CGPathRelease(dc.path);
+            }
+        } else if (inData->flags & x3view_rgb) {
+            /* todo */
+        }
     }
 
  ParameterMissing:
@@ -546,21 +546,21 @@ x3view_get_data(EventRef inEvent, x3view_data *inData)
        and size match. Also, just returning an x3view_data seems a
        little hacky. */
     err = GetEventParameter(inEvent, kEventParamControlDataTag, typeEnumeration,
-			    NULL, sizeof(OSType), NULL, &tag);
+                            NULL, sizeof(OSType), NULL, &tag);
     require_noerr(err, ParameterMissing);
 
     err = GetEventParameter(inEvent, kEventParamControlDataBuffer, typePtr,
-			    NULL, sizeof(Ptr), NULL, &ptr);
+                            NULL, sizeof(Ptr), NULL, &ptr);
 
     if (tag == kX3ViewPrivate) {
-	*((x3view_data **)ptr) = inData;
-	outSize = sizeof(x3view_data *);
+        *((x3view_data **)ptr) = inData;
+        outSize = sizeof(x3view_data *);
     } else
-	err = errDataNotSupported;
+        err = errDataNotSupported;
 
     if (err == noErr)
-	err = SetEventParameter(inEvent, kEventParamControlDataBufferSize, typeLongInteger,
-				sizeof(Size), &outSize);
+        err = SetEventParameter(inEvent, kEventParamControlDataBufferSize, typeLongInteger,
+                                sizeof(Size), &outSize);
 
  ParameterMissing:
     return err;
@@ -574,19 +574,19 @@ x3view_set_data(EventRef inEvent, x3view_data *inData)
     OSType tag;
 
     err = GetEventParameter(inEvent, kEventParamControlDataTag, typeEnumeration,
-			    NULL, sizeof(OSType), NULL, &tag);
+                            NULL, sizeof(OSType), NULL, &tag);
     require_noerr(err, ParameterMissing);
 
     err = GetEventParameter(inEvent, kEventParamControlDataBuffer, typePtr,
-			    NULL, sizeof(Ptr), NULL, &ptr);
+                            NULL, sizeof(Ptr), NULL, &ptr);
     require_noerr(err, ParameterMissing);
 
     if (tag == 'X3vc') {
-	inData->vc = *(x3viewclient **)ptr;
+        inData->vc = *(x3viewclient **)ptr;
     } else if (tag == 'X3vf') {
-	inData->flags = *(x3viewflags *)ptr;
+        inData->flags = *(x3viewflags *)ptr;
     } else
-	err = errDataNotSupported;
+        err = errDataNotSupported;
 
  ParameterMissing:
     return err;
@@ -601,19 +601,19 @@ x3view_hittest(EventRef inEvent, x3view_data *inData)
     ControlPartCode part;
 
     err = GetEventParameter(inEvent, kEventParamMouseLocation, typeHIPoint,
-			    NULL, sizeof(HIPoint), NULL, &where);
+                            NULL, sizeof(HIPoint), NULL, &where);
     require_noerr(err, ParameterMissing);
 
     err = HIViewGetBounds(inData->view, &bounds);
     require_noerr(err, ParameterMissing);
 
     if (CGRectContainsPoint(bounds, where))
-	part = 1;
+        part = 1;
     else
-	part = kControlNoPart;
+        part = kControlNoPart;
     err = SetEventParameter(inEvent, kEventParamControlPart,
-			    typeControlPartCode, sizeof(ControlPartCode),
-			    &part);
+                            typeControlPartCode, sizeof(ControlPartCode),
+                            &part);
     printf("hittest %g, %g!\n", where.x, where.y);
 
  ParameterMissing:
@@ -637,11 +637,11 @@ x3view_track(EventRef inEvent, x3view_data *inData)
     UInt32 mods;
 
     err = GetEventParameter(inEvent, kEventParamMouseLocation, typeHIPoint,
-			    NULL, sizeof(HIPoint), NULL, &where);
+                            NULL, sizeof(HIPoint), NULL, &where);
     require_noerr(err, ParameterMissing);
 
     err = GetEventParameter(inEvent, kEventParamKeyModifiers, typeUInt32,
-			    NULL, sizeof(UInt32), NULL, &mods);
+                            NULL, sizeof(UInt32), NULL, &mods);
     require_noerr(err, ParameterMissing);
 
     err = HIViewGetBounds(inData->view, &bounds);
@@ -650,7 +650,7 @@ x3view_track(EventRef inEvent, x3view_data *inData)
     GetWindowBounds(GetControlOwner(inData->view), kWindowStructureRgn, &windBounds);
 
     if (inData->vc && inData->vc->mouse)
-	inData->vc->mouse(inData->vc, 1, mods, where.x, where.y);
+        inData->vc->mouse(inData->vc, 1, mods, where.x, where.y);
 
 #ifdef VERBOSE
     printf("press: %g, %g!\n", where.x, where.y);
@@ -659,24 +659,24 @@ x3view_track(EventRef inEvent, x3view_data *inData)
 
     mouseStatus = kMouseTrackingMouseDown;
     while (mouseStatus != kMouseTrackingMouseUp) {
-	TrackMouseLocation(NULL, &theQDPoint, &mouseStatus);
-	where.x = theQDPoint.h - windBounds.left;
-	where.y = theQDPoint.v - windBounds.top;
-	HIViewConvertPoint(&where, NULL, inData->view);
+        TrackMouseLocation(NULL, &theQDPoint, &mouseStatus);
+        where.x = theQDPoint.h - windBounds.left;
+        where.y = theQDPoint.v - windBounds.top;
+        HIViewConvertPoint(&where, NULL, inData->view);
 #ifdef VERBOSE
-	printf("track %d: %g, %g!\n", mouseStatus, where.x, where.y);
+        printf("track %d: %g, %g!\n", mouseStatus, where.x, where.y);
 #endif
-	if (mouseStatus == kMouseTrackingMouseUp) {
-	    if (inData->vc && inData->vc->mouse)
-		inData->vc->mouse(inData->vc, -1, mods, where.x, where.y);
-	} else if (mouseStatus == kMouseTrackingKeyModifiersChanged) {
-	    mods = GetCurrentEventKeyModifiers();
-	    if (inData->vc && inData->vc->mouse)
-		inData->vc->mouse(inData->vc, 0, mods, where.x, where.y);
-	} else {
-	    if (inData->vc && inData->vc->mouse)
-		inData->vc->mouse(inData->vc, 0, mods, where.x, where.y);
-	}
+        if (mouseStatus == kMouseTrackingMouseUp) {
+            if (inData->vc && inData->vc->mouse)
+                inData->vc->mouse(inData->vc, -1, mods, where.x, where.y);
+        } else if (mouseStatus == kMouseTrackingKeyModifiersChanged) {
+            mods = GetCurrentEventKeyModifiers();
+            if (inData->vc && inData->vc->mouse)
+                inData->vc->mouse(inData->vc, 0, mods, where.x, where.y);
+        } else {
+            if (inData->vc && inData->vc->mouse)
+                inData->vc->mouse(inData->vc, 0, mods, where.x, where.y);
+        }
     }
 
  ParameterMissing:
@@ -685,8 +685,8 @@ x3view_track(EventRef inEvent, x3view_data *inData)
 
 pascal OSStatus
 x3view_handler(EventHandlerCallRef inCallRef,
-		EventRef inEvent,
-		void* inUserData )
+                EventRef inEvent,
+                void* inUserData )
 {
     OSStatus err = eventNotHandledErr;
     UInt32 eventClass = GetEventClass(inEvent);
@@ -694,51 +694,51 @@ x3view_handler(EventHandlerCallRef inCallRef,
     x3view_data *data = (x3view_data *)inUserData;
 
     printf("view handler %c%c%c%c %d\n",
-	   (eventClass >> 24) & 0xff, 
-	   (eventClass >> 16) & 0xff, 
-	   (eventClass >> 8) & 0xff, 
-	   (eventClass >> 0) & 0xff, 
-	   eventKind);
+           (eventClass >> 24) & 0xff, 
+           (eventClass >> 16) & 0xff, 
+           (eventClass >> 8) & 0xff, 
+           (eventClass >> 0) & 0xff, 
+           eventKind);
     switch (eventClass) {
     case kEventClassHIObject:
-	switch (eventKind) {
-	case kEventHIObjectConstruct:
-	    err = x3view_construct(inEvent);
-	    break;
-	case kEventHIObjectInitialize:
-	    err = x3view_initialize(inCallRef, inEvent, data);
-	    break;
-	case kEventHIObjectDestruct:
-	    err = x3view_destruct(inEvent, data);
-	    break;
-	}
-	break;
+        switch (eventKind) {
+        case kEventHIObjectConstruct:
+            err = x3view_construct(inEvent);
+            break;
+        case kEventHIObjectInitialize:
+            err = x3view_initialize(inCallRef, inEvent, data);
+            break;
+        case kEventHIObjectDestruct:
+            err = x3view_destruct(inEvent, data);
+            break;
+        }
+        break;
     case kEventClassControl:
-	switch (eventKind) {
-	case kEventControlInitialize:
-	    err = noErr;
-	    break;
-	case kEventControlDraw:
-	    err = x3view_draw(inEvent, data);
-	    break;
-	case kEventControlGetData:
-	    err = x3view_get_data(inEvent, data);
-	    break;
-	case kEventControlSetData:
-	    err = x3view_set_data(inEvent, data);
-	    break;
-	case kEventControlTrack:
-	    err = x3view_track(inEvent, data);
-	    break;
-	case kEventControlHitTest:
-	    err = x3view_hittest(inEvent, data);
-	    break;
-	case kEventControlClick:
-	    printf("click event\n");
-	    break;
-	    /*...*/
-	}
-	break;
+        switch (eventKind) {
+        case kEventControlInitialize:
+            err = noErr;
+            break;
+        case kEventControlDraw:
+            err = x3view_draw(inEvent, data);
+            break;
+        case kEventControlGetData:
+            err = x3view_get_data(inEvent, data);
+            break;
+        case kEventControlSetData:
+            err = x3view_set_data(inEvent, data);
+            break;
+        case kEventControlTrack:
+            err = x3view_track(inEvent, data);
+            break;
+        case kEventControlHitTest:
+            err = x3view_hittest(inEvent, data);
+            break;
+        case kEventControlClick:
+            printf("click event\n");
+            break;
+            /*...*/
+        }
+        break;
     }
     return err;
 }
@@ -750,38 +750,38 @@ x3view_register(void)
     static HIObjectClassRef x3view_ClassRef = NULL;
 
     if (x3view_ClassRef == NULL) {
-	EventTypeSpec eventList[] = {
-	    { kEventClassHIObject, kEventHIObjectConstruct },
-	    { kEventClassHIObject, kEventHIObjectInitialize },
-	    { kEventClassHIObject, kEventHIObjectDestruct },
+        EventTypeSpec eventList[] = {
+            { kEventClassHIObject, kEventHIObjectConstruct },
+            { kEventClassHIObject, kEventHIObjectInitialize },
+            { kEventClassHIObject, kEventHIObjectDestruct },
 
-	    { kEventClassControl, kEventControlActivate },
-	    { kEventClassControl, kEventControlDeactivate },
-	    { kEventClassControl, kEventControlDraw },
-	    { kEventClassControl, kEventControlHiliteChanged },
-	    { kEventClassControl, kEventControlHitTest },
-	    { kEventClassControl, kEventControlInitialize },
-	    { kEventClassControl, kEventControlGetData },
-	    { kEventClassControl, kEventControlSetData },
-	    { kEventClassControl, kEventControlTrack },
-	    { kEventClassControl, kEventControlClick }
-	};
-	err = HIObjectRegisterSubclass(kX3ViewClassID,
-				       kHIViewClassID,
-				       0,
-				       x3view_handler,
-				       GetEventTypeCount(eventList),
-				       eventList,
-				       NULL,
-				       &x3view_ClassRef);
+            { kEventClassControl, kEventControlActivate },
+            { kEventClassControl, kEventControlDeactivate },
+            { kEventClassControl, kEventControlDraw },
+            { kEventClassControl, kEventControlHiliteChanged },
+            { kEventClassControl, kEventControlHitTest },
+            { kEventClassControl, kEventControlInitialize },
+            { kEventClassControl, kEventControlGetData },
+            { kEventClassControl, kEventControlSetData },
+            { kEventClassControl, kEventControlTrack },
+            { kEventClassControl, kEventControlClick }
+        };
+        err = HIObjectRegisterSubclass(kX3ViewClassID,
+                                       kHIViewClassID,
+                                       0,
+                                       x3view_handler,
+                                       GetEventTypeCount(eventList),
+                                       eventList,
+                                       NULL,
+                                       &x3view_ClassRef);
     }
     return err;
 }
 
 OSStatus x3view_create(
-	WindowRef		inWindow,
-	const HIRect*		inBounds,
-	HIViewRef*		outView)
+        WindowRef               inWindow,
+        const HIRect*           inBounds,
+        HIViewRef*              outView)
 {
     OSStatus err;
     EventRef event;
@@ -790,23 +790,23 @@ OSStatus x3view_create(
     require_noerr(err, CantRegister);
 
     err = CreateEvent(NULL, kEventClassHIObject, kEventHIObjectInitialize,
-		      GetCurrentEventTime(), 0, &event);
+                      GetCurrentEventTime(), 0, &event);
     require_noerr(err, CantCreateEvent);
 
     if (inBounds != NULL) {
-	err = SetEventParameter(event, 'Boun', typeHIRect, sizeof(HIRect),
-				inBounds);
-	require_noerr(err, CantSetParameter);
+        err = SetEventParameter(event, 'Boun', typeHIRect, sizeof(HIRect),
+                                inBounds);
+        require_noerr(err, CantSetParameter);
     }
 
     err = HIObjectCreate(kX3ViewClassID, event, (HIObjectRef*)outView);
     require_noerr(err, CantCreate);
 
     if (inWindow != NULL) {
-	HIViewRef root;
-	err = GetRootControl(inWindow, &root);
-	require_noerr(err, CantGetRootView);
-	err = HIViewAddSubview(root, *outView);
+        HIViewRef root;
+        err = GetRootControl(inWindow, &root);
+        require_noerr(err, CantGetRootView);
+        err = HIViewAddSubview(root, *outView);
     }
  CantCreate:
  CantGetRootView:
@@ -835,7 +835,7 @@ void
 x3view_dirty(x3widget *w)
 {
     if (w->var == x3carbonhiview)
-	HIViewSetNeedsDisplay(w->u.hiview, true);
+        HIViewSetNeedsDisplay(w->u.hiview, true);
 }
 
 void x3view_scrollto(x3widget *w, int x, int y, int width, int height)
@@ -856,26 +856,26 @@ void x3viewclient_init(x3viewclient *vc)
 void x3setactive(x3widget *w, int active)
 {
     if (w->var == x3carbonmenuitem) {
-	MenuRef menu = w->parent->u.menu;
-	if (active)
-	    EnableMenuItem(menu, w->u.menuitem);
-	else
-	    DisableMenuItem(menu, w->u.menuitem);
-	/* According to Carbon docs, we need to redraw menu. */
+        MenuRef menu = w->parent->u.menu;
+        if (active)
+            EnableMenuItem(menu, w->u.menuitem);
+        else
+            DisableMenuItem(menu, w->u.menuitem);
+        /* According to Carbon docs, we need to redraw menu. */
     } else if (w->var == x3carbonhiview) {
-	if (active)
-	    ActivateControl(w->u.hiview);
-	else
-	    DeactivateControl(w->u.hiview);
+        if (active)
+            ActivateControl(w->u.hiview);
+        else
+            DeactivateControl(w->u.hiview);
     }
 }
 
 int x3hasfocus(x3widget *w)
 {
     if (w->var == x3carbonhiview) {
-	return HIViewSubtreeContainsFocus(w->u.hiview);
+        return HIViewSubtreeContainsFocus(w->u.hiview);
     } else
-	return 0;
+        return 0;
 }
 
 /* 2d drawing functions, implemented using Quartz */
@@ -884,7 +884,7 @@ void
 x3moveto(x3dc *dc, double x, double y)
 {
     if (dc->path == NULL) {
-	dc->path = CGPathCreateMutable();
+        dc->path = CGPathCreateMutable();
     }
     CGPathMoveToPoint(dc->path, NULL, x, y);
 }
@@ -897,9 +897,9 @@ x3lineto(x3dc *dc, double x, double y)
 
 void 
 x3curveto(x3dc *dc,
-	  double x1, double y1,
-	  double x2, double y2,
-	  double x3, double y3)
+          double x1, double y1,
+          double x2, double y2,
+          double x3, double y3)
 {
     CGPathAddCurveToPoint(dc->path, NULL, x1, y1, x2, y2, x3, y3);
 }
@@ -916,7 +916,7 @@ x3rectangle(x3dc *dc, double x, double y, double width, double height)
     CGRect rect;
 
     if (dc->path == NULL) {
-	dc->path = CGPathCreateMutable();
+        dc->path = CGPathCreateMutable();
     }
     rect.origin.x = x;
     rect.origin.y = y;
@@ -938,15 +938,15 @@ void
 x3setrgba(x3dc *dc, unsigned int rgba)
 {
     CGContextSetRGBFillColor(dc->ctx,
-			     ((rgba >> 24) & 0xff) * (1.0/255),
-			     ((rgba >> 16) & 0xff) * (1.0/255),
-			     ((rgba >> 8) & 0xff) * (1.0/255),
-			     (rgba & 0xff) * (1.0/255));
+                             ((rgba >> 24) & 0xff) * (1.0/255),
+                             ((rgba >> 16) & 0xff) * (1.0/255),
+                             ((rgba >> 8) & 0xff) * (1.0/255),
+                             (rgba & 0xff) * (1.0/255));
     CGContextSetRGBStrokeColor(dc->ctx,
-			       ((rgba >> 24) & 0xff) * (1.0/255),
-			       ((rgba >> 16) & 0xff) * (1.0/255),
-			       ((rgba >> 8) & 0xff) * (1.0/255),
-			       (rgba & 0xff) * (1.0/255));
+                               ((rgba >> 24) & 0xff) * (1.0/255),
+                               ((rgba >> 16) & 0xff) * (1.0/255),
+                               ((rgba >> 8) & 0xff) * (1.0/255),
+                               (rgba & 0xff) * (1.0/255));
 }
 
 void

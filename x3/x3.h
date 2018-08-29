@@ -38,7 +38,7 @@ typedef struct _x3dc x3dc;
 struct _x3viewclient {
     void (*destroy)(x3viewclient *self);
     void (*mouse)(x3viewclient *self, int buttons, int mods,
-		  double x, double y);
+                  double x, double y);
     int (*key)(x3viewclient *self, char *keyname, int mods, int key);
     void (*draw)(x3viewclient *self, x3dc *dc);
 };
@@ -139,10 +139,10 @@ struct _x3widget {
     x3widget *parent;
     x3carbonvar var;
     union {
-	HIViewRef hiview;
-	WindowRef window;
-	MenuRef menu;
-	int menuitem;
+        HIViewRef hiview;
+        WindowRef window;
+        MenuRef menu;
+        int menuitem;
     } u;
     int n_children;
     x3widget **children;
@@ -212,7 +212,7 @@ struct _x3widget {
     x3rect sizerequest;
     x3winvar var; // should this be in the type?
     union {
-	HWND hwnd;
+        HWND hwnd;
     } u;
     int n_children;
     x3widget **children;
@@ -225,15 +225,15 @@ void x3init_win32(HINSTANCE hInstance);
 #endif
 
 typedef int (*x3window_callback)(x3widget *window, void *data,
-				 char *cmd, char *what, char *arg,
-				 void *more);
+                                 char *cmd, char *what, char *arg,
+                                 void *more);
 
 /* Main loop */
 void x3init(int *pargc, char ***pargv);
 void x3main(void);
 
 x3widget *x3window(x3windowflags flags, char *label,
-		   x3window_callback callback, void *callback_data);
+                   x3window_callback callback, void *callback_data);
 x3widget *x3menu(x3widget *parent, char *name);
 x3widget *x3menuitem(x3widget *parent, char *name, char *cmd, char *shortcut);
 x3widget *x3menusep(x3widget *parent);
@@ -254,7 +254,7 @@ void x3viewclient_init(x3viewclient *vc);
 void x3window_setdefaultsize(x3widget *w, int width, int height);
 
 void x3pane_setsizing(x3widget *w, int child1_resize, int child1_shrink,
-		      int child2_resize, int child2_shrink);
+                      int child2_resize, int child2_shrink);
 
 void x3setactive(x3widget *w, int active);
 int x3hasfocus(x3widget *w);
@@ -267,9 +267,9 @@ extern int x3n_winopen;
 void x3moveto(x3dc *dc, double x, double y);
 void x3lineto(x3dc *dc, double x, double y);
 void x3curveto(x3dc *dc,
-	       double x1, double y1,
-	       double x2, double y2,
-	       double x3, double y3);
+               double x1, double y1,
+               double x2, double y2,
+               double x3, double y3);
 void x3closepath(x3dc *dc);
 void x3rectangle(x3dc *dc, double x, double y, double width, double height);
 void x3getcurrentpoint(x3dc *dc, double *px, double *py);

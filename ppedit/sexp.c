@@ -35,43 +35,43 @@ parse_double(sexp_reader *sr)
 
     i = 0;
     if (b[i] == '+') {
-	i++;
+        i++;
     } else if (b[i] == '-') {
-	sign = -1.0;
-	i++;
+        sign = -1.0;
+        i++;
     }
     numstart = i;
     while (b[i] >= '0' && b[i] <= '9')
-	val = val * 10.0 + b[i++] - '0';
+        val = val * 10.0 + b[i++] - '0';
     if (b[i] == '.') {
-	double frac = 1.0;
+        double frac = 1.0;
 
-	for (i++; b[i] >= '0' && b[i] <= '9'; i++) {
-	    frac *= 0.1;
-	    val += (b[i] - '0') * frac;
-	}
+        for (i++; b[i] >= '0' && b[i] <= '9'; i++) {
+            frac *= 0.1;
+            val += (b[i] - '0') * frac;
+        }
 
-	/* A '.' without any digits on either side isn't valid. */
-	if (i == numstart + 1)
-	    is_double = 0;
+        /* A '.' without any digits on either side isn't valid. */
+        if (i == numstart + 1)
+            is_double = 0;
     }
     if (b[i] == 'e' || b[i] == 'E') {
-	int expsign = 1, exp = 0;
-	int expstart;
+        int expsign = 1, exp = 0;
+        int expstart;
 
-	if (b[i] == '+') {
-	    i++;
-	} else if (b[i] == '-') {
-	    expsign = -1;
-	    i++;
-	}
-	expstart = i;
-	while (b[i] >= '0' && b[i] <= '9')
-	    exp = exp * 10 + b[i++] - '0';
+        if (b[i] == '+') {
+            i++;
+        } else if (b[i] == '-') {
+            expsign = -1;
+            i++;
+        }
+        expstart = i;
+        while (b[i] >= '0' && b[i] <= '9')
+            exp = exp * 10 + b[i++] - '0';
 
-	if (i == expstart)
-	    is_double = 0;
-	val *= pow(10.0, expsign * exp);
+        if (i == expstart)
+            is_double = 0;
+        val *= pow(10.0, expsign * exp);
     }
     val *= sign;
     sr->d = val;
@@ -89,39 +89,39 @@ sexp_token(sexp_reader *sr)
 
     sr->singlechar = -1;
     if (sr->f == NULL)
-	return 0;
+        return 0;
 
     for (;;) {
-	c = getc(sr->f);
-	if (c == EOF) {
-	    sr->f = NULL;
-	    return 0;
-	} else if (c == '#') {
-	    do {
-		c = getc(sr->f);
-	    } while (c != EOF && c != '\r' && c != '\n');
-	} else if (c != ' ' && c != '\r' && c != '\n' && c != '\t')
-	    break;
+        c = getc(sr->f);
+        if (c == EOF) {
+            sr->f = NULL;
+            return 0;
+        } else if (c == '#') {
+            do {
+                c = getc(sr->f);
+            } while (c != EOF && c != '\r' && c != '\n');
+        } else if (c != ' ' && c != '\r' && c != '\n' && c != '\t')
+            break;
     }
     sr->tokbuf[0] = c;
     i = 1;
     if (c != '(' && c != ')') {
-	for (;;) {
-	    c = getc(sr->f);
-	    if (c == EOF) {
-		sr->f = NULL;
-		break;
-	    } else if (c == ' ' || c == '\r' || c == '\n' || c == '\t') {
-		break;
-	    } else if (c == '(' || c == ')' || c == '#') {
-		ungetc(c, sr->f);
-		break;
-	    } else if (i < sizeof(sr->tokbuf) - 1)
-		sr->tokbuf[i++] = c;
-	}
+        for (;;) {
+            c = getc(sr->f);
+            if (c == EOF) {
+                sr->f = NULL;
+                break;
+            } else if (c == ' ' || c == '\r' || c == '\n' || c == '\t') {
+                break;
+            } else if (c == '(' || c == ')' || c == '#') {
+                ungetc(c, sr->f);
+                break;
+            } else if (i < sizeof(sr->tokbuf) - 1)
+                sr->tokbuf[i++] = c;
+        }
     }
     sr->tokbuf[i] = 0;
     if (i == 1)
-	sr->singlechar = sr->tokbuf[0];
+        sr->singlechar = sr->tokbuf[0];
     return 1 + parse_double(sr);
 }

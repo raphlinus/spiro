@@ -71,7 +71,7 @@ quit_func(GtkWidget *widget, gpointer dummy)
 #define C1 0.55228
 static void
 draw_dot(art_u8 *buf, int x0, int y0, int x1, int y1, int rowstride,
-	 double x, double y, double r, guint32 rgba)
+         double x, double y, double r, guint32 rgba)
 {
     ArtBpath bp[6];
     ArtVpath *vp;
@@ -120,7 +120,7 @@ draw_dot(art_u8 *buf, int x0, int y0, int x1, int y1, int rowstride,
 
 static void
 draw_raw_rect(art_u8 *buf, int x0, int y0, int x1, int y1, int rowstride,
-	      double rx0, double ry0, double rx1, double ry1, guint32 rgba)
+              double rx0, double ry0, double rx1, double ry1, guint32 rgba)
 {
     ArtVpath vp[6];
     ArtSVP *svp;
@@ -150,15 +150,15 @@ draw_raw_rect(art_u8 *buf, int x0, int y0, int x1, int y1, int rowstride,
 
 static void
 draw_rect(art_u8 *buf, int x0, int y0, int x1, int y1, int rowstride,
-	 double x, double y, double r, guint32 rgba)
+         double x, double y, double r, guint32 rgba)
 {
     draw_raw_rect(buf, x0, y0, x1, y1, rowstride,
-		  x - r, y - r, x + r, y + r, rgba);
+                  x - r, y - r, x + r, y + r, rgba);
 }
 
 static void
 draw_half(art_u8 *buf, int x0, int y0, int x1, int y1, int rowstride,
-	 double x, double y, double r, double th, guint32 rgba)
+         double x, double y, double r, double th, guint32 rgba)
 {
     ArtBpath bp[6];
     ArtVpath *vp;
@@ -204,124 +204,124 @@ bezctx_to_vpath(bezctx *bc)
 
     g_free(bp);
     if (vp[0].code == ART_END || vp[1].code == ART_END) {
-	g_free(vp);
-	vp = NULL;
+        g_free(vp);
+        vp = NULL;
     }
     return vp;
 }
 
 static void
 draw_plate(art_u8 *buf, int x0, int y0, int x1, int y1, int rowstride,
-	   plate_edit *pe)
+           plate_edit *pe)
 {
     plate *p = pe->p;
     int i, j;
 
     /* find an existing point to select, if any */
     for (i = 0; i < p->n_sp; i++) {
-	bezctx *bc = new_bezctx_libart();
-	subpath *sp = &p->sp[i];
-	spiro_seg *s = draw_subpath(sp, bc);
-	ArtVpath *vp = bezctx_to_vpath(bc);
+        bezctx *bc = new_bezctx_libart();
+        subpath *sp = &p->sp[i];
+        spiro_seg *s = draw_subpath(sp, bc);
+        ArtVpath *vp = bezctx_to_vpath(bc);
 
-	if (vp != NULL) {
-	    ArtSVP *svp = art_svp_vpath_stroke(vp, ART_PATH_STROKE_JOIN_MITER,
-					       ART_PATH_STROKE_CAP_BUTT,
-					       1.5, 4.0, 0.25);
+        if (vp != NULL) {
+            ArtSVP *svp = art_svp_vpath_stroke(vp, ART_PATH_STROKE_JOIN_MITER,
+                                               ART_PATH_STROKE_CAP_BUTT,
+                                               1.5, 4.0, 0.25);
 
-	    art_free(vp);
-	    art_rgb_svp_alpha(svp, x0, y0, x1, y1, 0x000000ff, buf, rowstride,
-			      NULL);
-	    art_svp_free(svp);
-	}
+            art_free(vp);
+            art_rgb_svp_alpha(svp, x0, y0, x1, y1, 0x000000ff, buf, rowstride,
+                              NULL);
+            art_svp_free(svp);
+        }
 
-	for (j = 0; j < sp->n_kt; j++) {
-	    if (pe->show_knots) {
-		knot *kt = &sp->kt[j];
-		kt_flags kf = kt->flags;
-		if ((kf & KT_SELECTED) && (kf & KT_OPEN)) {
-		    draw_dot(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
-			     3, 0x000000ff);
-		    draw_dot(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
-			     1.5, 0xffffffff);
-		} else if ((kf & KT_SELECTED) && (kf & KT_CORNER)) {
-		    draw_rect(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
-			      3, 0x000000ff);
-		    draw_rect(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
-			      1.5, 0xffffffff);
-		} else if (!(kf & KT_SELECTED) && (kf & KT_CORNER)) {
-		    draw_rect(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
-			      2.5, 0x000080ff);
-		} else if ((kf & KT_SELECTED) && (kf & KT_CORNU)) {
-		    draw_rect(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
-			      3, 0xc000c0ff);
-		    draw_rect(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
-			      1.5, 0xffffffff);
-		} else if (!(kf & KT_SELECTED) && (kf & KT_CORNU)) {
-		    draw_rect(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
-			      2.5, 0x800080ff);
-		} else if ((kf & KT_LEFT) || (kf & KT_RIGHT)) {
-		    double th = 1.5708 + (s ? get_knot_th(s, j) : 0);
-		    if (kf & KT_LEFT)
-			th += 3.1415926;
-		    if (kf & KT_SELECTED) {
-			draw_half(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
-				 4, th, 0x000000ff);
-			draw_half(buf, x0, y0, x1, y1, rowstride,
-				  kt->x + sin(th), kt->y - cos(th),
-				  2, th, 0xffffffff);
-		    } else {
-			draw_half(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
-				  3, th, 0x000080ff);
-		    }
-		} else {
-		    draw_dot(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
-			     2, 0x000080ff);
-		}
-	    }
-	}
-	free_spiro(s);
+        for (j = 0; j < sp->n_kt; j++) {
+            if (pe->show_knots) {
+                knot *kt = &sp->kt[j];
+                kt_flags kf = kt->flags;
+                if ((kf & KT_SELECTED) && (kf & KT_OPEN)) {
+                    draw_dot(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
+                             3, 0x000000ff);
+                    draw_dot(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
+                             1.5, 0xffffffff);
+                } else if ((kf & KT_SELECTED) && (kf & KT_CORNER)) {
+                    draw_rect(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
+                              3, 0x000000ff);
+                    draw_rect(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
+                              1.5, 0xffffffff);
+                } else if (!(kf & KT_SELECTED) && (kf & KT_CORNER)) {
+                    draw_rect(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
+                              2.5, 0x000080ff);
+                } else if ((kf & KT_SELECTED) && (kf & KT_CORNU)) {
+                    draw_rect(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
+                              3, 0xc000c0ff);
+                    draw_rect(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
+                              1.5, 0xffffffff);
+                } else if (!(kf & KT_SELECTED) && (kf & KT_CORNU)) {
+                    draw_rect(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
+                              2.5, 0x800080ff);
+                } else if ((kf & KT_LEFT) || (kf & KT_RIGHT)) {
+                    double th = 1.5708 + (s ? get_knot_th(s, j) : 0);
+                    if (kf & KT_LEFT)
+                        th += 3.1415926;
+                    if (kf & KT_SELECTED) {
+                        draw_half(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
+                                 4, th, 0x000000ff);
+                        draw_half(buf, x0, y0, x1, y1, rowstride,
+                                  kt->x + sin(th), kt->y - cos(th),
+                                  2, th, 0xffffffff);
+                    } else {
+                        draw_half(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
+                                  3, th, 0x000080ff);
+                    }
+                } else {
+                    draw_dot(buf, x0, y0, x1, y1, rowstride, kt->x, kt->y,
+                             2, 0x000080ff);
+                }
+            }
+        }
+        free_spiro(s);
     }
 }
 
 static void
 draw_selection(art_u8 *buf, int x0, int y0, int x1, int y1, int rowstride,
-	       plate_edit *pe)
+               plate_edit *pe)
 {
     plate *p = pe->p;
 
     if (p->motmode == MOTION_MODE_SELECT) {
-	double rx0 = p->sel_x0;
-	double ry0 = p->sel_y0;
-	double rx1 = p->x0;
-	double ry1 = p->y0;
-	if (rx0 > rx1) {
-	    double tmp = rx1;
-	    rx1 = rx0;
-	    rx0 = tmp;
-	}
-	if (ry0 > ry1) {
-	    double tmp = ry1;
-	    ry1 = ry0;
-	    ry0 = tmp;
-	}
-	if (rx1 > rx0 && ry1 > ry0)
-	    draw_raw_rect(buf, x0, y0, x1, y1, rowstride,
-			  rx0, ry0, rx1, ry1, 0x0000ff20);
+        double rx0 = p->sel_x0;
+        double ry0 = p->sel_y0;
+        double rx1 = p->x0;
+        double ry1 = p->y0;
+        if (rx0 > rx1) {
+            double tmp = rx1;
+            rx1 = rx0;
+            rx0 = tmp;
+        }
+        if (ry0 > ry1) {
+            double tmp = ry1;
+            ry1 = ry0;
+            ry0 = tmp;
+        }
+        if (rx1 > rx0 && ry1 > ry0)
+            draw_raw_rect(buf, x0, y0, x1, y1, rowstride,
+                          rx0, ry0, rx1, ry1, 0x0000ff20);
     }
 }
 
 static void
 render_bg_layer(guchar *buf, int rowstride, int x0, int y0, int x1, int y1,
-		plate_edit *pe)
+                plate_edit *pe)
 {
     const double affine[6] = { 1, 0, 0, 1, 0, 0 };
 
     if (pe->show_bg && pe->bg_image)
-	render_image(pe->bg_image, affine,
-		     buf, rowstride, x0, y0, x1, y1);
+        render_image(pe->bg_image, affine,
+                     buf, rowstride, x0, y0, x1, y1);
     else
-	memset(buf, 255, (y1 - y0) * rowstride);
+        memset(buf, 255, (y1 - y0) * rowstride);
 }
 
 static gint
@@ -344,10 +344,10 @@ data_expose (GtkWidget *widget, GdkEventExpose *event, void *data)
     draw_selection(rgb, x0, y0, x0 + width, y0 + height, rowstride, pe);
 
     gdk_draw_rgb_image(widget->window,
-		       widget->style->black_gc,
-		       x0, y0, width, height,
-		       GDK_RGB_DITHER_NONE, rgb,
-		       rowstride);
+                       widget->style->black_gc,
+                       x0, y0, width, height,
+                       GDK_RGB_DITHER_NONE, rgb,
+                       rowstride);
     g_free(rgb);
     return FALSE;
 }
@@ -359,10 +359,10 @@ makeroom_undo(plate_edit *pe)
     const int undo_max = sizeof(pe->undo_buf) / sizeof(undo_record);
 
     if (pe->undo_n == undo_max) {
-	free_plate(pe->undo_buf[0].p);
-	memmove(pe->undo_buf, pe->undo_buf + 1, (undo_max - 1) * sizeof(undo_record));
-	pe->undo_i--;
-	pe->undo_n--;
+        free_plate(pe->undo_buf[0].p);
+        memmove(pe->undo_buf, pe->undo_buf + 1, (undo_max - 1) * sizeof(undo_record));
+        pe->undo_i--;
+        pe->undo_n--;
     }
 }
 
@@ -372,13 +372,13 @@ set_undo_menuitem(GtkWidget *me, const char *name, const char *desc)
     char str[256];
 
     if (desc) {
-	sprintf(str, "%s %s", name, desc);
+        sprintf(str, "%s %s", name, desc);
     } else {
-	strcpy(str, name);
+        strcpy(str, name);
     }
     gtk_container_foreach(GTK_CONTAINER(me),
-			  (GtkCallback)gtk_label_set_text,
-			  str);
+                          (GtkCallback)gtk_label_set_text,
+                          str);
     gtk_widget_set_sensitive(me, desc != NULL);
 }
 
@@ -395,15 +395,15 @@ begin_undo_xn(plate_edit *pe)
     int i;
 
     if (pe->undo_xn_state != 1) {
-	for (i = pe->undo_i; i < pe->undo_n; i++)
-	    free_plate(pe->undo_buf[i].p);
-	pe->undo_n = pe->undo_i;
-	makeroom_undo(pe);
-	i = pe->undo_i;
-	pe->undo_buf[i].description = pe->description;
-	pe->undo_buf[i].p = copy_plate(pe->p);
-	pe->undo_n = i + 1;
-	pe->undo_xn_state = 1;
+        for (i = pe->undo_i; i < pe->undo_n; i++)
+            free_plate(pe->undo_buf[i].p);
+        pe->undo_n = pe->undo_i;
+        makeroom_undo(pe);
+        i = pe->undo_i;
+        pe->undo_buf[i].description = pe->description;
+        pe->undo_buf[i].p = copy_plate(pe->p);
+        pe->undo_n = i + 1;
+        pe->undo_xn_state = 1;
     }
 }
 
@@ -411,15 +411,15 @@ static void
 dirty_undo_xn(plate_edit *pe, const char *description)
 {
     if (pe->undo_xn_state == 0) {
-	g_warning("dirty_undo_xn: not in begin_undo_xn state");
-	begin_undo_xn(pe);
+        g_warning("dirty_undo_xn: not in begin_undo_xn state");
+        begin_undo_xn(pe);
     }
     if (description == NULL)
-	description = pe->p->description;
+        description = pe->p->description;
     if (pe->undo_xn_state == 1) {
-	pe->undo_i++;
-	pe->undo_xn_state = 2;
-	set_undo_state(pe, description, NULL);
+        pe->undo_i++;
+        pe->undo_xn_state = 2;
+        set_undo_state(pe, description, NULL);
     }
     pe->description = description;
 }
@@ -435,7 +435,7 @@ static void
 end_undo_xn(plate_edit *pe)
 {
     if (pe->undo_xn_state == 0) {
-	g_warning("end_undo_xn: not in undo xn");
+        g_warning("end_undo_xn: not in undo xn");
     }
     pe->undo_xn_state = 0;
 }
@@ -444,21 +444,21 @@ static int
 undo(plate_edit *pe)
 {
     if (pe->undo_i == 0)
-	return 0;
+        return 0;
 
     if (pe->undo_i == pe->undo_n) {
-	makeroom_undo(pe);
-	pe->undo_buf[pe->undo_i].description = pe->description;
-	pe->undo_buf[pe->undo_i].p = pe->p;
-	pe->undo_n++;
+        makeroom_undo(pe);
+        pe->undo_buf[pe->undo_i].description = pe->description;
+        pe->undo_buf[pe->undo_i].p = pe->p;
+        pe->undo_n++;
     } else {
-	free_plate(pe->p);
+        free_plate(pe->p);
     }
     pe->undo_i--;
     pe->description = pe->undo_buf[pe->undo_i].description;
     set_undo_state(pe,
-		   pe->undo_i > 0 ? pe->description : NULL,
-		   pe->undo_buf[pe->undo_i + 1].description);
+                   pe->undo_i > 0 ? pe->description : NULL,
+                   pe->undo_buf[pe->undo_i + 1].description);
     g_print("undo: %d of %d\n", pe->undo_i, pe->undo_n);
     pe->p = copy_plate(pe->undo_buf[pe->undo_i].p);
     return 1;
@@ -468,13 +468,13 @@ static int
 redo(plate_edit *pe)
 {
     if (pe->undo_i >= pe->undo_n - 1)
-	return 0;
+        return 0;
     free_plate(pe->p);
     pe->undo_i++;
     set_undo_state(pe,
-		   pe->undo_buf[pe->undo_i].description,
-		   pe->undo_i < pe->undo_n - 1 ?
-		   pe->undo_buf[pe->undo_i + 1].description : NULL);
+                   pe->undo_buf[pe->undo_i].description,
+                   pe->undo_i < pe->undo_n - 1 ?
+                   pe->undo_buf[pe->undo_i + 1].description : NULL);
     pe->description = pe->undo_buf[pe->undo_i].description;
     pe->p = copy_plate(pe->undo_buf[pe->undo_i].p);
     g_print("redo: %d of %d\n", pe->undo_i, pe->undo_n);
@@ -492,7 +492,7 @@ data_button_press (GtkWidget *widget, GdkEventButton *event, gpointer data)
 #define noVERBOSE
 #ifdef VERBOSE
     g_print ("button press %f %f %f %d\n",
-	     event->x, event->y, event->pressure, event->type);
+             event->x, event->y, event->pressure, event->type);
 
 #endif
     x = event->x;
@@ -550,9 +550,9 @@ data_motion (GtkWidget *widget, GdkEventMotion *event, gpointer data)
 
 #endif
     if (pe->p->motmode == MOTION_MODE_MOVE)
-	return data_motion_move(widget, event, pe);
+        return data_motion_move(widget, event, pe);
     else if (pe->p->motmode == MOTION_MODE_SELECT)
-	return data_motion_select(widget, event, pe);
+        return data_motion_select(widget, event, pe);
     return TRUE;
 }
 
@@ -583,40 +583,40 @@ key_press(GtkWidget *widget, GdkEventKey *event, gpointer data)
     g_print("key press %d %s %d\n", event->keyval, event->string, event->state);
 
     if (event->keyval == '<') {
-	did_something = TRUE;
-	n_iter -= delta;
+        did_something = TRUE;
+        n_iter -= delta;
     } else if (event->keyval == '>') {
-	n_iter += delta;
+        n_iter += delta;
     }
     if (n_iter < 0) n_iter = 0;
     if (n_iter != old_n_iter)
-	g_print("n_iter = %d\n", n_iter);
+        g_print("n_iter = %d\n", n_iter);
 
     if (event->keyval == GDK_Left)
-	dx = -1;
+        dx = -1;
     else if (event->keyval == GDK_Right)
-	dx = 1;
+        dx = 1;
     else if (event->keyval == GDK_Up)
-	dy = -1;
+        dy = -1;
     else if (event->keyval == GDK_Down)
-	dy = 1;
+        dy = 1;
     if (event->state & GDK_SHIFT_MASK) {
-	dx *= 10;
-	dy *= 10;
+        dx *= 10;
+        dy *= 10;
     } else if (event->state & GDK_CONTROL_MASK) {
-	dx *= .1;
-	dy *= .1;
+        dx *= .1;
+        dy *= .1;
     }
     if (dx != 0 || dy != 0) {
-	begindirty_undo_xn(pe, "Keyboard move");
-	plate_motion_move(pe->p, pe->p->x0 + dx, pe->p->y0 + dy);
-	end_undo_xn(pe);
-	did_something = TRUE;
+        begindirty_undo_xn(pe, "Keyboard move");
+        plate_motion_move(pe->p, pe->p->x0 + dx, pe->p->y0 + dy);
+        end_undo_xn(pe);
+        did_something = TRUE;
     }
 
     if (did_something) {
-	gtk_signal_emit_stop_by_name(GTK_OBJECT(widget), "key-press-event");
-	gtk_widget_queue_draw(widget);
+        gtk_signal_emit_stop_by_name(GTK_OBJECT(widget), "key-press-event");
+        gtk_widget_queue_draw(widget);
     }
 
     return did_something;
@@ -743,8 +743,8 @@ toggle_show_knots_func(GtkWidget *widget, gpointer data)
 
     pe->show_knots = !pe->show_knots;
     gtk_container_foreach(GTK_CONTAINER(pe->show_knots_me),
-			  (GtkCallback)gtk_label_set_text,
-			  pe->show_knots ? "Hide Knots" : "Show Knots");
+                          (GtkCallback)gtk_label_set_text,
+                          pe->show_knots ? "Hide Knots" : "Show Knots");
     gtk_widget_queue_draw(pe->da);
     return TRUE;
 }
@@ -756,8 +756,8 @@ toggle_show_bg_func(GtkWidget *widget, gpointer data)
 
     pe->show_bg = !pe->show_bg;
     gtk_container_foreach(GTK_CONTAINER(pe->show_bg_me),
-			  (GtkCallback)gtk_label_set_text,
-			  pe->show_bg ? "Hide BG" : "Show BG");
+                          (GtkCallback)gtk_label_set_text,
+                          pe->show_bg ? "Hide BG" : "Show BG");
     gtk_widget_queue_draw(pe->da);
     return TRUE;
 }
@@ -773,8 +773,8 @@ print_func(GtkWidget *widget, gpointer data)
 
     fputs(ps_prolog, f);
     for (i = 0; i < p->n_sp; i++) {
-	subpath *sp = &p->sp[i];
-	free_spiro(draw_subpath(sp, bc));
+        subpath *sp = &p->sp[i];
+        free_spiro(draw_subpath(sp, bc));
     }
     bezctx_ps_close(bc);
     fputs(ps_postlog, f);
@@ -784,7 +784,7 @@ print_func(GtkWidget *widget, gpointer data)
 
 static GtkWidget *
 add_menuitem(GtkWidget *menu, const char *name, GtkSignalFunc callback,
-	     gpointer callback_data, GtkAccelGroup *ag, const char *accel)
+             gpointer callback_data, GtkAccelGroup *ag, const char *accel)
 {
     GtkWidget *menuitem;
 
@@ -792,14 +792,14 @@ add_menuitem(GtkWidget *menu, const char *name, GtkSignalFunc callback,
     gtk_menu_append(GTK_MENU(menu), menuitem);
     gtk_widget_show(menuitem);
     if (accel != NULL) {
-	guint accel_key, accel_mods;
+        guint accel_key, accel_mods;
 
-	gtk_accelerator_parse(accel, &accel_key, &accel_mods);
-	gtk_widget_add_accelerator(menuitem, "activate", ag,
-				   accel_key, accel_mods, GTK_ACCEL_VISIBLE);
+        gtk_accelerator_parse(accel, &accel_key, &accel_mods);
+        gtk_widget_add_accelerator(menuitem, "activate", ag,
+                                   accel_key, accel_mods, GTK_ACCEL_VISIBLE);
     }
     gtk_signal_connect(GTK_OBJECT(menuitem), "activate",
-		       (GtkSignalFunc)callback, callback_data);
+                       (GtkSignalFunc)callback, callback_data);
     return (menuitem);
 }
 
@@ -817,11 +817,11 @@ create_mainwin(plate_edit *p)
     void *data = p;
 
     mainwin = gtk_widget_new(gtk_window_get_type(),
-			  "GtkWindow::type", GTK_WINDOW_TOPLEVEL,
-			  "GtkWindow::title", "pattern plate editor",
-			  NULL);
+                          "GtkWindow::type", GTK_WINDOW_TOPLEVEL,
+                          "GtkWindow::title", "pattern plate editor",
+                          NULL);
     gtk_signal_connect(GTK_OBJECT(mainwin), "destroy",
-		       (GtkSignalFunc)quit_func, NULL);
+                       (GtkSignalFunc)quit_func, NULL);
 
     vbox = gtk_vbox_new(FALSE, 0);
     gtk_container_add(GTK_CONTAINER(mainwin), vbox);
@@ -867,31 +867,31 @@ create_mainwin(plate_edit *p)
     gtk_widget_show(menuitem);
     gtk_menu_set_accel_group(GTK_MENU(menu), ag);
     p->show_knots_me = add_menuitem(menu, "Hide Knots",
-				    (GtkSignalFunc)toggle_show_knots_func,
-				    data, ag, "<ctrl>K");
+                                    (GtkSignalFunc)toggle_show_knots_func,
+                                    data, ag, "<ctrl>K");
     p->show_bg_me = add_menuitem(menu, "Hide BG",
-				 (GtkSignalFunc)toggle_show_bg_func,
-				 data, ag, "<ctrl>B");
+                                 (GtkSignalFunc)toggle_show_bg_func,
+                                 data, ag, "<ctrl>B");
 
     eb = gtk_event_box_new ();
     GTK_WIDGET_SET_FLAGS(eb, GTK_CAN_FOCUS);
     gtk_box_pack_start(GTK_BOX(vbox), eb, TRUE, TRUE, 0);
     gtk_widget_set_extension_events (eb, GDK_EXTENSION_EVENTS_ALL);
     gtk_signal_connect(GTK_OBJECT (eb), "button-press-event",
-		       (GtkSignalFunc) data_button_press, data);
+                       (GtkSignalFunc) data_button_press, data);
     gtk_signal_connect(GTK_OBJECT (eb), "motion-notify-event",
-		       (GtkSignalFunc) data_motion, data);
+                       (GtkSignalFunc) data_motion, data);
     gtk_signal_connect(GTK_OBJECT (eb), "button-release-event",
-		       (GtkSignalFunc) data_button_release, data);
+                       (GtkSignalFunc) data_button_release, data);
     gtk_signal_connect(GTK_OBJECT(eb), "key-press-event",
-		       (GtkSignalFunc)key_press, data);
+                       (GtkSignalFunc)key_press, data);
 
     da = gtk_drawing_area_new();
     p->da = da;
     gtk_window_set_default_size(GTK_WINDOW(mainwin), 512, 512);
     gtk_container_add(GTK_CONTAINER(eb), da);
     gtk_signal_connect(GTK_OBJECT (da), "expose-event",
-		       (GtkSignalFunc) data_expose, data);
+                       (GtkSignalFunc) data_expose, data);
 #if 0
     gtk_widget_set_double_buffered(da, FALSE);
 #endif
@@ -914,9 +914,9 @@ int main(int argc, char **argv)
     char *reason;
 
     if (argc > 1)
-	p = file_read_plate(argv[1]);
+        p = file_read_plate(argv[1]);
     if (p == NULL)
-	p = new_plate();
+        p = new_plate();
     pe.p = p;
     pe.undo_n = 0;
     pe.undo_i = 0;

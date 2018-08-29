@@ -16,15 +16,15 @@ x3_getfirst_callback(GtkWidget *widget, gpointer data)
     GtkWidget **pwidget = (GtkWidget **)data;
 
     if (*pwidget == NULL)
-	*pwidget = widget;
+        *pwidget = widget;
 }
 
 static GtkWidget *x3_gtkwidget_getchild(GtkWidget *w)
 {
     GtkWidget *child = NULL;
     gtk_container_foreach(GTK_CONTAINER(w),
-			  x3_getfirst_callback,
-			  (gpointer)&child);
+                          x3_getfirst_callback,
+                          (gpointer)&child);
     return child;
 }
 
@@ -36,41 +36,41 @@ typedef struct {
 } x3widget_box;
 
 static void x3widget_init(x3widget *w, x3widget *parent, char *name,
-			  GtkWidget *widget)
+                          GtkWidget *widget)
 {
     w->name = g_strdup(name);
     w->widget = widget;
     w->parent = parent;
     if (parent) {
-	if (GTK_IS_WINDOW(parent->widget)) {
-	    GtkWidget *vbox = x3_gtkwidget_getchild(parent->widget);
+        if (GTK_IS_WINDOW(parent->widget)) {
+            GtkWidget *vbox = x3_gtkwidget_getchild(parent->widget);
 
-	    if (GTK_IS_MENU_ITEM(widget)) {
-		GtkWidget *first_child = x3_gtkwidget_getchild(vbox);
-		GtkWidget *menubar;
+            if (GTK_IS_MENU_ITEM(widget)) {
+                GtkWidget *first_child = x3_gtkwidget_getchild(vbox);
+                GtkWidget *menubar;
 
-		if (first_child == NULL || !GTK_IS_MENU_BAR(first_child)) {
-		    menubar = gtk_menu_bar_new();
-		    gtk_box_pack_start(GTK_BOX(vbox), menubar,
-				       FALSE, FALSE, 0);
-		    gtk_widget_show(menubar);
-		} else
-		    menubar = first_child;
-		gtk_menu_bar_append(GTK_MENU_BAR(menubar), widget);
-	    } else {
-		gtk_container_add(GTK_CONTAINER(vbox), widget);
-	    }
-	} else if (GTK_IS_MENU_ITEM(parent->widget)) {
-	    GtkWidget *menu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(parent->widget));
+                if (first_child == NULL || !GTK_IS_MENU_BAR(first_child)) {
+                    menubar = gtk_menu_bar_new();
+                    gtk_box_pack_start(GTK_BOX(vbox), menubar,
+                                       FALSE, FALSE, 0);
+                    gtk_widget_show(menubar);
+                } else
+                    menubar = first_child;
+                gtk_menu_bar_append(GTK_MENU_BAR(menubar), widget);
+            } else {
+                gtk_container_add(GTK_CONTAINER(vbox), widget);
+            }
+        } else if (GTK_IS_MENU_ITEM(parent->widget)) {
+            GtkWidget *menu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(parent->widget));
 
-	    gtk_menu_shell_append(GTK_MENU_SHELL(menu), widget);
-	} else if (GTK_IS_BOX(parent->widget)) {
-	    x3widget_box *pwb = (x3widget_box *)parent;
-	    gtk_box_pack_start(GTK_BOX(parent->widget), widget,
-			       pwb->expand, pwb->fill, pwb->padding);
-	} else {
-	    gtk_container_add(GTK_CONTAINER(parent->widget), widget);
-	}
+            gtk_menu_shell_append(GTK_MENU_SHELL(menu), widget);
+        } else if (GTK_IS_BOX(parent->widget)) {
+            x3widget_box *pwb = (x3widget_box *)parent;
+            gtk_box_pack_start(GTK_BOX(parent->widget), widget,
+                               pwb->expand, pwb->fill, pwb->padding);
+        } else {
+            gtk_container_add(GTK_CONTAINER(parent->widget), widget);
+        }
     }
 }
 
@@ -123,12 +123,12 @@ gboolean x3window_delete(GtkWidget *window, GdkEvent *event, gpointer data)
 {
     /* todo: pass this as a command callback */
     if (--x3n_winopen <= 0)
-	gtk_main_quit();
+        gtk_main_quit();
     return FALSE;
 }
 
 x3widget *x3window(x3windowflags flags, char *label,
-		   x3window_callback callback, void *callback_data)
+                   x3window_callback callback, void *callback_data)
 {
     GtkWidget *window;
     GtkWidget *vbox;
@@ -146,7 +146,7 @@ x3widget *x3window(x3windowflags flags, char *label,
     result->accel_group = gtk_accel_group_new();
     gtk_window_add_accel_group(GTK_WINDOW(window), result->accel_group);
     g_signal_connect(G_OBJECT(window), "delete-event",
-		     G_CALLBACK(x3window_delete), result);
+                     G_CALLBACK(x3window_delete), result);
     x3qshow(&result->base);
     x3n_winopen++;
     return &result->base;
@@ -293,7 +293,7 @@ static const char *asciinames[] = {
 /* return 1 on success */
 static int
 x3parseshortcut(const char *shortcut,
-		guint *accelerator_key, GdkModifierType *accelerator_mods)
+                guint *accelerator_key, GdkModifierType *accelerator_mods)
 {
     int len;
     char tmp[256];
@@ -304,13 +304,13 @@ x3parseshortcut(const char *shortcut,
     if (len >= sizeof(tmp) - 1) return 0;
     strcpy(tmp, shortcut);
     for (i = 0; i < len - 5; i++)
-	if (!memcmp(tmp + i, "<cmd>", 5))
-	    memcpy(tmp + i, "<ctl>", 5);
+        if (!memcmp(tmp + i, "<cmd>", 5))
+            memcpy(tmp + i, "<ctl>", 5);
     if (len == 1 || tmp[len - 2] == '>') {
-	unsigned char c = (unsigned char)tmp[len-1];
-	if (c < sizeof(asciinames) / sizeof(asciinames[0]) && asciinames[c] &&
-	    len + strlen(asciinames[c]) < sizeof(tmp))
-	    strcpy(tmp + len - 1, asciinames[c]);
+        unsigned char c = (unsigned char)tmp[len-1];
+        if (c < sizeof(asciinames) / sizeof(asciinames[0]) && asciinames[c] &&
+            len + strlen(asciinames[c]) < sizeof(tmp))
+            strcpy(tmp + len - 1, asciinames[c]);
     }
     gtk_accelerator_parse(tmp, accelerator_key, accelerator_mods);
     return *accelerator_key != 0 || *accelerator_mods != 0;
@@ -335,11 +335,11 @@ x3widget *x3menuitem(x3widget *parent, char *name, char *cmd, char *shortcut)
     x3widget_init(&result->base, parent, cmd, item);
     result->cmd = g_strdup(cmd);
     g_signal_connect(G_OBJECT(item), "activate",
-		     G_CALLBACK(x3cmdable_clicked), result);
+                     G_CALLBACK(x3cmdable_clicked), result);
 
     if (x3parseshortcut(shortcut, &accel_key, &accel_mods)) {
-	gtk_widget_add_accelerator(item, "activate", x3getaccelgroup(parent),
-				   accel_key, accel_mods, GTK_ACCEL_VISIBLE);
+        gtk_widget_add_accelerator(item, "activate", x3getaccelgroup(parent),
+                                   accel_key, accel_mods, GTK_ACCEL_VISIBLE);
     }
 
     gtk_widget_show(item);
@@ -410,7 +410,7 @@ x3widget *x3button(x3widget *parent, char *cmd, char *label)
     x3widget_init(&result->base, parent, cmd, button);
     result->cmd = g_strdup(cmd);
     g_signal_connect(G_OBJECT(button), "clicked",
-		     G_CALLBACK(x3cmdable_clicked), result);
+                     G_CALLBACK(x3cmdable_clicked), result);
 
     gtk_widget_show(button);
     return &result->base;
@@ -439,52 +439,52 @@ typedef struct {
 } x3widget_view;
 
 static gboolean x3view_expose(GtkWidget *widget, GdkEventExpose *event,
-			      gpointer data)
+                              gpointer data)
 {
     x3widget_view *w = (x3widget_view *)data;
     GdkWindow *window = GTK_IS_LAYOUT(widget) ?
-	GTK_LAYOUT(widget)->bin_window :
-	widget->window;
+        GTK_LAYOUT(widget)->bin_window :
+        widget->window;
 
     if (w->vc && w->vc->draw) {
-	x3dc dc;
+        x3dc dc;
 
-	dc.x = event->area.x;
-	dc.y = event->area.y;
-	dc.width = event->area.width;
-	dc.height = event->area.height;
-	if (w->flags & x3view_rgb) {
-	    dc.rowstride = (event->area.width * 3 + 3) & -4;
-	    dc.buf = (guchar *)malloc(event->area.height * dc.rowstride);
-	    dc.cr = NULL;
+        dc.x = event->area.x;
+        dc.y = event->area.y;
+        dc.width = event->area.width;
+        dc.height = event->area.height;
+        if (w->flags & x3view_rgb) {
+            dc.rowstride = (event->area.width * 3 + 3) & -4;
+            dc.buf = (guchar *)malloc(event->area.height * dc.rowstride);
+            dc.cr = NULL;
 
-	    w->vc->draw(w->vc, &dc);
-	    gdk_draw_rgb_image(window, widget->style->black_gc,
-			       event->area.x, event->area.y,
-			       event->area.width, event->area.height,
-			       GDK_RGB_DITHER_NORMAL,
-			       dc.buf, dc.rowstride);
-	    free(dc.buf);
-	} else if (w->flags & x3view_2d) {
-	    dc.cr = gdk_cairo_create(window);
-	    dc.buf = NULL;
+            w->vc->draw(w->vc, &dc);
+            gdk_draw_rgb_image(window, widget->style->black_gc,
+                               event->area.x, event->area.y,
+                               event->area.width, event->area.height,
+                               GDK_RGB_DITHER_NORMAL,
+                               dc.buf, dc.rowstride);
+            free(dc.buf);
+        } else if (w->flags & x3view_2d) {
+            dc.cr = gdk_cairo_create(window);
+            dc.buf = NULL;
 
-	    w->vc->draw(w->vc, &dc);
-	    cairo_destroy(dc.cr);
-	}
+            w->vc->draw(w->vc, &dc);
+            cairo_destroy(dc.cr);
+        }
     }
 
 #if 1
     /* experimental code for managing cairo dynamics */
     if (event->count == 0)
-	gdk_flush();
+        gdk_flush();
 #endif
 
     return TRUE;
 }
 
 static gboolean x3view_button_press(GtkWidget *widget, GdkEventButton *event,
-				    gpointer data)
+                                    gpointer data)
 {
     x3widget_view *w = (x3widget_view *)data;
     guint button = event->button;
@@ -492,35 +492,35 @@ static gboolean x3view_button_press(GtkWidget *widget, GdkEventButton *event,
     if (event->type == GDK_BUTTON_RELEASE) button = -button;
 
     if (w->vc && w->vc->mouse) {
-	w->vc->mouse(w->vc, button, event->state, event->x, event->y);
-	return TRUE;
+        w->vc->mouse(w->vc, button, event->state, event->x, event->y);
+        return TRUE;
     }
     x3sync();
     return FALSE;
 }
 
 static gboolean x3view_pointer_motion(GtkWidget *widget, GdkEventButton *event,
-				    gpointer data)
+                                    gpointer data)
 {
     x3widget_view *w = (x3widget_view *)data;
 
     if (w->vc && w->vc->mouse) {
-	w->vc->mouse(w->vc, 0, event->state,
-		     event->x, event->y);
-	return TRUE;
+        w->vc->mouse(w->vc, 0, event->state,
+                     event->x, event->y);
+        return TRUE;
     }
     x3sync();
     return FALSE;
 }
 
 static gboolean x3view_key_press(GtkWidget *widget, GdkEventKey *event,
-				 gpointer data)
+                                 gpointer data)
 {
     x3widget_view *w = (x3widget_view *)data;
 
     if (w->vc && w->vc->key)
-	return w->vc->key(w->vc, gdk_keyval_name(event->keyval),
-			  event->state, event->keyval);
+        return w->vc->key(w->vc, gdk_keyval_name(event->keyval),
+                          event->state, event->keyval);
     x3sync();
     return FALSE;
 }
@@ -534,46 +534,46 @@ x3widget *x3view(x3widget *parent, x3viewflags flags, x3viewclient *vc)
     GdkEventMask eventmask = 0;
 
     if (flags & x3view_scroll) {
-	container = gtk_scrolled_window_new(NULL, NULL);
-	drawing_area = gtk_layout_new(NULL, NULL);
-	event_target = drawing_area;
-	/* todo: more intelligent size requesting of view */
-	gtk_widget_set_size_request(drawing_area, 1500, 1500);
-	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(container),
-					      drawing_area);
+        container = gtk_scrolled_window_new(NULL, NULL);
+        drawing_area = gtk_layout_new(NULL, NULL);
+        event_target = drawing_area;
+        /* todo: more intelligent size requesting of view */
+        gtk_widget_set_size_request(drawing_area, 1500, 1500);
+        gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(container),
+                                              drawing_area);
     } else {
-	container = gtk_event_box_new();
-	drawing_area = gtk_drawing_area_new();
-	event_target = container;
-	gtk_container_add(GTK_CONTAINER(container), drawing_area);
+        container = gtk_event_box_new();
+        drawing_area = gtk_drawing_area_new();
+        event_target = container;
+        gtk_container_add(GTK_CONTAINER(container), drawing_area);
     }
     gtk_widget_show(container);
 
     if (flags & x3view_key) {
-	g_object_set(GTK_OBJECT(event_target), "can-focus", TRUE, NULL);
-	eventmask |= GDK_KEY_PRESS_MASK;
-	g_signal_connect(G_OBJECT(event_target), "key_press_event",
-			 G_CALLBACK(x3view_key_press), result);
+        g_object_set(GTK_OBJECT(event_target), "can-focus", TRUE, NULL);
+        eventmask |= GDK_KEY_PRESS_MASK;
+        g_signal_connect(G_OBJECT(event_target), "key_press_event",
+                         G_CALLBACK(x3view_key_press), result);
     }
     if (flags & x3view_click) {
-	eventmask |= GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK;
-	g_signal_connect(G_OBJECT(event_target), "button_press_event",
-			 G_CALLBACK(x3view_button_press), result);
-	g_signal_connect(G_OBJECT(event_target), "button_release_event",
-			 G_CALLBACK(x3view_button_press), result);
+        eventmask |= GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK;
+        g_signal_connect(G_OBJECT(event_target), "button_press_event",
+                         G_CALLBACK(x3view_button_press), result);
+        g_signal_connect(G_OBJECT(event_target), "button_release_event",
+                         G_CALLBACK(x3view_button_press), result);
     }
     if (flags & x3view_hover) {
-	eventmask |= GDK_POINTER_MOTION_MASK;
-	g_signal_connect(G_OBJECT(event_target), "motion_notify_event",
-			 G_CALLBACK(x3view_pointer_motion), result);
+        eventmask |= GDK_POINTER_MOTION_MASK;
+        g_signal_connect(G_OBJECT(event_target), "motion_notify_event",
+                         G_CALLBACK(x3view_pointer_motion), result);
     }
     gtk_widget_add_events(event_target, eventmask);
 
     g_signal_connect(G_OBJECT(drawing_area), "expose_event",
-		     G_CALLBACK(x3view_expose), result);
+                     G_CALLBACK(x3view_expose), result);
     gtk_widget_show(drawing_area);
     if (flags & x3view_rgb)
-	gtk_widget_set_double_buffered(drawing_area, FALSE);
+        gtk_widget_set_double_buffered(drawing_area, FALSE);
 
     x3widget_init(&result->base, parent, NULL, container);
     result->flags = flags;
@@ -590,23 +590,23 @@ static void
 x3scrollto_adj(GtkAdjustment *adj, int v, int size)
 {
     if (adj && v != -1) {
-	if (size >= adj->page_size) {
-	    /* target is bigger than adj; center as best as possible */
-	    gtk_adjustment_set_value(adj, v - 0.5 * (size - adj->page_size));
-	} else if (adj->value > v) {
-	    gtk_adjustment_set_value(adj, v);
-	} else if (adj->value + adj->page_size < v + size) {
-	    gtk_adjustment_set_value(adj, v + size - adj->page_size);
-	}
+        if (size >= adj->page_size) {
+            /* target is bigger than adj; center as best as possible */
+            gtk_adjustment_set_value(adj, v - 0.5 * (size - adj->page_size));
+        } else if (adj->value > v) {
+            gtk_adjustment_set_value(adj, v);
+        } else if (adj->value + adj->page_size < v + size) {
+            gtk_adjustment_set_value(adj, v + size - adj->page_size);
+        }
     }
 }
 
 void x3view_scrollto(x3widget *w, int x, int y, int width, int height)
 {
     if (GTK_IS_SCROLLED_WINDOW(w->widget)) {
-	GtkScrolledWindow *sw = GTK_SCROLLED_WINDOW(w->widget);
-	x3scrollto_adj(gtk_scrolled_window_get_hadjustment(sw), x, width);
-	x3scrollto_adj(gtk_scrolled_window_get_vadjustment(sw), y, height);
+        GtkScrolledWindow *sw = GTK_SCROLLED_WINDOW(w->widget);
+        x3scrollto_adj(gtk_scrolled_window_get_hadjustment(sw), x, width);
+        x3scrollto_adj(gtk_scrolled_window_get_vadjustment(sw), y, height);
     }
 }
 
@@ -623,10 +623,10 @@ void x3viewclient_init(x3viewclient *vc)
 void x3setpacking(x3widget *w, int fill, int expand, int padding)
 {
     if (GTK_IS_BOX(w->widget)) {
-	x3widget_box *wb= (x3widget_box *)w;
-	wb->fill = fill;
-	wb->expand = expand;
-	wb->padding = padding;
+        x3widget_box *wb= (x3widget_box *)w;
+        wb->fill = fill;
+        wb->expand = expand;
+        wb->padding = padding;
     }
 }
 
@@ -642,10 +642,10 @@ x3pane_setsizing_callback(GtkWidget *child, gpointer data)
 {
     x3pane_setsizing_ctx *ctx = (x3pane_setsizing_ctx *)data;
     gtk_container_child_set(GTK_CONTAINER(ctx->parent),
-			    child,
-			    "resize", ctx->resize[ctx->i],
-			    "shrink", ctx->shrink[ctx->i],
-			    NULL);
+                            child,
+                            "resize", ctx->resize[ctx->i],
+                            "shrink", ctx->shrink[ctx->i],
+                            NULL);
     ctx->i++;
 }
 
@@ -653,7 +653,7 @@ x3pane_setsizing_callback(GtkWidget *child, gpointer data)
  * children are added. It wouldn't be too hard to fix, by putting the
  * info in the pane's x3widget struct. */
 void x3pane_setsizing(x3widget *w, int child1_resize, int child1_shrink,
-		      int child2_resize, int child2_shrink)
+                      int child2_resize, int child2_shrink)
 {
     x3pane_setsizing_ctx ctx;
 
@@ -664,9 +664,9 @@ void x3pane_setsizing(x3widget *w, int child1_resize, int child1_shrink,
     ctx.shrink[1] = child2_shrink;
     ctx.i = 0;
     if (GTK_IS_PANED(w->widget)) {
-	gtk_container_foreach(GTK_CONTAINER(w->widget),
-			      x3pane_setsizing_callback,
-			      (gpointer)&ctx);
+        gtk_container_foreach(GTK_CONTAINER(w->widget),
+                              x3pane_setsizing_callback,
+                              (gpointer)&ctx);
     }
 }
 
@@ -680,7 +680,7 @@ int x3hasfocus(x3widget *w)
 {
     GtkWidget *widget = w->widget;
     while (GTK_IS_CONTAINER(widget) && !GTK_IS_LAYOUT(widget))
-	widget = x3_gtkwidget_getchild(widget);
+        widget = x3_gtkwidget_getchild(widget);
     return GTK_WIDGET_HAS_FOCUS(widget);
 }
 
@@ -700,9 +700,9 @@ x3lineto(x3dc *dc, double x, double y)
 
 void 
 x3curveto(x3dc *dc,
-	  double x1, double y1,
-	  double x2, double y2,
-	  double x3, double y3)
+          double x1, double y1,
+          double x2, double y2,
+          double x3, double y3)
 {
     cairo_curve_to(dc->cr, x1, y1, x2, y2, x3, y3);
 }
@@ -729,10 +729,10 @@ void
 x3setrgba(x3dc *dc, unsigned int rgba)
 {
     cairo_set_source_rgba(dc->cr,
-			  ((rgba >> 24) & 0xff) * (1.0/255),
-			  ((rgba >> 16) & 0xff) * (1.0/255),
-			  ((rgba >> 8) & 0xff) * (1.0/255),
-			  (rgba & 0xff) * (1.0/255));
+                          ((rgba >> 24) & 0xff) * (1.0/255),
+                          ((rgba >> 16) & 0xff) * (1.0/255),
+                          ((rgba >> 8) & 0xff) * (1.0/255),
+                          (rgba & 0xff) * (1.0/255));
 }
 
 void

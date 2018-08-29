@@ -49,31 +49,31 @@ pascal OSStatus my_handler(EventHandlerCallRef nextHandler, EventRef theEvent, v
 
     switch (klass) {
     case kEventClassMouse:
-	switch (kind) {
-	case kEventMouseDown:
-	    err = GetEventParameter(theEvent, kEventParamMouseLocation,
-				       typeQDPoint, NULL, sizeof(where), NULL, &where);
-	    printf("mouse down %d %d\n", where.h, where.v);
-	    break;
-	}
-	break;
+        switch (kind) {
+        case kEventMouseDown:
+            err = GetEventParameter(theEvent, kEventParamMouseLocation,
+                                       typeQDPoint, NULL, sizeof(where), NULL, &where);
+            printf("mouse down %d %d\n", where.h, where.v);
+            break;
+        }
+        break;
     case kEventClassWindow:
-	switch (kind) {
-	case kEventWindowDrawContent:
-	    printf("draw content\n");
-	    result = noErr;
-	    break;
-	case kEventWindowClickContentRgn:
-	    printf("click_content region\n");
-	    break;
-	case kEventWindowHandleContentClick:
-	    err = GetEventParameter(theEvent, kEventParamMouseLocation,
-				    typeQDPoint, NULL, sizeof(where), NULL, &where);
-	    GetWindowBounds(window, kWindowContentRgn, &bounds);
-	    printf("content click %d, %d; %d, %d\n", where.h, where.v,
-		   where.h - bounds.left, where.v - bounds.top);
-	    break;
-	}
+        switch (kind) {
+        case kEventWindowDrawContent:
+            printf("draw content\n");
+            result = noErr;
+            break;
+        case kEventWindowClickContentRgn:
+            printf("click_content region\n");
+            break;
+        case kEventWindowHandleContentClick:
+            err = GetEventParameter(theEvent, kEventParamMouseLocation,
+                                    typeQDPoint, NULL, sizeof(where), NULL, &where);
+            GetWindowBounds(window, kWindowContentRgn, &bounds);
+            printf("content click %d, %d; %d, %d\n", where.h, where.v,
+                   where.h - bounds.left, where.v - bounds.top);
+            break;
+        }
     }
     return result;
 }
@@ -90,16 +90,16 @@ pascal OSStatus app_handler(EventHandlerCallRef nextHandler, EventRef theEvent, 
     MenuItemIndex ix;
 
     printf("app_handler %c%c%c%c\n",
-	   (c >> 24) & 255, (c >> 16) & 255, (c >> 8) & 255, c & 255);
+           (c >> 24) & 255, (c >> 16) & 255, (c >> 8) & 255, c & 255);
     switch (c) {
     case kHICommandUndo:
-	GetIndMenuItemWithCommandID(NULL, kHICommandUndo, 1, &menu, &ix);
-	SetMenuItemTextWithCFString(menu, ix, CFSTR("Undo disabled"));
-	DisableMenuItem(menu, ix);
-	break;
+        GetIndMenuItemWithCommandID(NULL, kHICommandUndo, 1, &menu, &ix);
+        SetMenuItemTextWithCFString(menu, ix, CFSTR("Undo disabled"));
+        DisableMenuItem(menu, ix);
+        break;
     case kCommandToggleCorner:
-	pe_view_toggle_corner(pe->view);
-	break;
+        pe_view_toggle_corner(pe->view);
+        break;
     }
     return result;
 }
@@ -120,31 +120,31 @@ void
 init_window(WindowRef window, plate_edit *pe)
 {
     EventTypeSpec app_event_types[] = {
-	{ kEventClassCommand, kEventProcessCommand }
+        { kEventClassCommand, kEventProcessCommand }
     };
     EventTypeSpec event_types[] = {
-	{ kEventClassWindow, kEventWindowDrawContent },
-	{ kEventClassWindow, kEventWindowHandleContentClick },
-	{ kEventClassMouse, kEventMouseDown }
+        { kEventClassWindow, kEventWindowDrawContent },
+        { kEventClassWindow, kEventWindowHandleContentClick },
+        { kEventClassMouse, kEventMouseDown }
     };
 
     InstallApplicationEventHandler(NewEventHandlerUPP(app_handler),
-				   GetEventTypeCount(app_event_types),
-				   app_event_types, (void *)pe, NULL);
+                                   GetEventTypeCount(app_event_types),
+                                   app_event_types, (void *)pe, NULL);
     InstallWindowEventHandler(window, NewEventHandlerUPP(my_handler),
-			      GetEventTypeCount(event_types),
-			      event_types, (void *)pe, NULL);
+                              GetEventTypeCount(event_types),
+                              event_types, (void *)pe, NULL);
 
     add_pe_view(window, pe, pe->p);
 }
 
 int main(int argc, char* argv[])
 {
-    IBNibRef 		nibRef;
-    WindowRef 		window;
+    IBNibRef            nibRef;
+    WindowRef           window;
     plate_edit pe;
     
-    OSStatus		err;
+    OSStatus            err;
 
     // Create a Nib reference passing the name of the nib file (without the .nib extension)
     // CreateNibReference only searches into the application bundle.
@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
     pe.window_ref = window;
     pe.p = file_read_plate("/Users/raph/golf/ppedit/g.plate");
     if (pe.p == NULL)
-	pe.p = new_plate();
+        pe.p = new_plate();
     init_window(window, &pe);
     // The window was created hidden so show it.
     ShowWindow( window );
@@ -178,5 +178,5 @@ int main(int argc, char* argv[])
 CantCreateWindow:
 CantSetMenuBar:
 CantGetNibRef:
-	return err;
+        return err;
 }

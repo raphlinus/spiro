@@ -8,4 +8,4 @@ free_image(image *im);
 
 void
 render_image(image *im, const double affine[6],
-	     unsigned char *buf, int rowstride, int x0, int y0, int x1, int y1);
+             unsigned char *buf, int rowstride, int x0, int y0, int x1, int y1);

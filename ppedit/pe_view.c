@@ -47,18 +47,18 @@ pe_view_construct(EventRef inEvent)
     data = (pe_view_data *)malloc(sizeof(pe_view_data));
     require_action(data != NULL, CantMalloc, err = memFullErr);
     err = GetEventParameter(inEvent, kEventParamHIObjectInstance,
-			    typeHIObjectRef, NULL, sizeof(HIObjectRef), NULL,
-			    (HIObjectRef *)&data->view);
+                            typeHIObjectRef, NULL, sizeof(HIObjectRef), NULL,
+                            (HIObjectRef *)&data->view);
     require_noerr(err, ParameterMissing);
     err = SetEventParameter(inEvent, kEventParamHIObjectInstance,
-			    typeVoidPtr, sizeof(pe_view_data *), &data);
+                            typeVoidPtr, sizeof(pe_view_data *), &data);
 
     data->p = NULL;
     data->show_knots = 1;
 
  ParameterMissing:
     if (err != noErr)
-	free(data);
+        free(data);
 
  CantMalloc:
     return err;
@@ -73,7 +73,7 @@ pe_view_destruct(EventRef inEvent, pe_view_data *inData)
 
 static OSStatus
 pe_view_initialize(EventHandlerCallRef inCallRef, EventRef inEvent,
-		   pe_view_data *inData)
+                   pe_view_data *inData)
 {
     OSStatus err;
     HIRect bounds;
@@ -82,7 +82,7 @@ pe_view_initialize(EventHandlerCallRef inCallRef, EventRef inEvent,
     require_noerr(err, TroubleInSuperClass);
 
     err = GetEventParameter(inEvent, 'Boun', typeHIRect,
-			    NULL, sizeof(HIRect), NULL, &bounds);
+                            NULL, sizeof(HIRect), NULL, &bounds);
     require_noerr(err, ParameterMissing);
 
     HIViewSetFrame(inData->view, &bounds);
@@ -101,15 +101,15 @@ cgcontext_set_rgba(CGContextRef ctx, unsigned int rgba)
 {
     const double norm = 1.0 / 255;
     CGContextSetRGBFillColor(ctx,
-			     ((rgba >> 24) & 0xff) * norm,
-			     ((rgba >> 16) & 0xff) * norm,
-			     ((rgba >> 8) & 0xff) * norm,
-			     (rgba & 0xff) * norm);
+                             ((rgba >> 24) & 0xff) * norm,
+                             ((rgba >> 16) & 0xff) * norm,
+                             ((rgba >> 8) & 0xff) * norm,
+                             (rgba & 0xff) * norm);
 }
 
 static void
 draw_dot(CGContextRef ctx, double x, double y, double r,
-	 unsigned int rgba)
+         unsigned int rgba)
 {
     cgcontext_set_rgba(ctx, rgba);
     CGMutablePathRef path = CGPathCreateMutable();
@@ -121,7 +121,7 @@ draw_dot(CGContextRef ctx, double x, double y, double r,
 
 static void
 draw_raw_rect(CGContextRef ctx, double x0, double y0, double x1, double y1,
-	      unsigned int rgba)
+              unsigned int rgba)
 {
     HIRect rect;
 
@@ -135,7 +135,7 @@ draw_raw_rect(CGContextRef ctx, double x0, double y0, double x1, double y1,
 
 static void
 draw_rect(CGContextRef ctx, double x, double y, double r,
-	 unsigned int rgba)
+         unsigned int rgba)
 {
     draw_raw_rect(ctx, x - r, y - r, x + r, y + r, rgba);
 }
@@ -150,40 +150,40 @@ draw_plate(CGContextRef ctx, pe_view_data *pe)
     spiro_seg **ss = znew(spiro_seg *, p->n_sp);
 
     for (i = 0; i < p->n_sp; i++) {
-	bc = new_bezctx_quartz();
-	ss[i] = draw_subpath(&p->sp[i], bc);
-	CGMutablePathRef path = bezctx_to_quartz(bc);
-	CGContextAddPath(ctx, path);
-	CGPathRelease(path);
-	CGContextStrokePath(ctx);
+        bc = new_bezctx_quartz();
+        ss[i] = draw_subpath(&p->sp[i], bc);
+        CGMutablePathRef path = bezctx_to_quartz(bc);
+        CGContextAddPath(ctx, path);
+        CGPathRelease(path);
+        CGContextStrokePath(ctx);
     }
 
     for (i = 0; i < p->n_sp; i++) {
-	if (pe->show_knots) {
-	    sp = &p->sp[i];
-	    for (j = 0; j < sp->n_kt; j++) {
-		knot *kt = &sp->kt[j];
-		kt_flags kf = kt->flags;
-		if ((kf & KT_SELECTED) && (kf & KT_OPEN)) {
-		    draw_dot(ctx, kt->x, kt->y,
-			     3, 0x000000ff);
-		    draw_dot(ctx, kt->x, kt->y,
-			     1.5, 0xffffffff);
-		} else if ((kf & KT_SELECTED) && (kf & KT_CORNER)) {
-		    draw_rect(ctx, kt->x, kt->y,
-			      3, 0x000000ff);
-		    draw_rect(ctx, kt->x, kt->y,
-			      1.5, 0xffffffff);
-		} else if (!(kf & KT_SELECTED) && (kf & KT_CORNER)) {
-		    draw_rect(ctx, kt->x, kt->y,
-			      2.5, 0x000080ff);
-		} else {
-		    draw_dot(ctx, kt->x, kt->y,
-			     2, 0x000080ff);
-		}
-	    }
-	}
-	spiro_free(ss[i]);
+        if (pe->show_knots) {
+            sp = &p->sp[i];
+            for (j = 0; j < sp->n_kt; j++) {
+                knot *kt = &sp->kt[j];
+                kt_flags kf = kt->flags;
+                if ((kf & KT_SELECTED) && (kf & KT_OPEN)) {
+                    draw_dot(ctx, kt->x, kt->y,
+                             3, 0x000000ff);
+                    draw_dot(ctx, kt->x, kt->y,
+                             1.5, 0xffffffff);
+                } else if ((kf & KT_SELECTED) && (kf & KT_CORNER)) {
+                    draw_rect(ctx, kt->x, kt->y,
+                              3, 0x000000ff);
+                    draw_rect(ctx, kt->x, kt->y,
+                              1.5, 0xffffffff);
+                } else if (!(kf & KT_SELECTED) && (kf & KT_CORNER)) {
+                    draw_rect(ctx, kt->x, kt->y,
+                              2.5, 0x000080ff);
+                } else {
+                    draw_dot(ctx, kt->x, kt->y,
+                             2, 0x000080ff);
+                }
+            }
+        }
+        spiro_free(ss[i]);
     }
     zfree(ss);
 }
@@ -194,22 +194,22 @@ draw_selection(CGContextRef ctx, pe_view_data *pe)
     plate *p = pe->p;
 
     if (p->motmode == MOTION_MODE_SELECT) {
-	double rx0 = p->sel_x0;
-	double ry0 = p->sel_y0;
-	double rx1 = p->x0;
-	double ry1 = p->y0;
-	if (rx0 > rx1) {
-	    double tmp = rx1;
-	    rx1 = rx0;
-	    rx0 = tmp;
-	}
-	if (ry0 > ry1) {
-	    double tmp = ry1;
-	    ry1 = ry0;
-	    ry0 = tmp;
-	}
-	if (rx1 > rx0 && ry1 > ry0)
-	    draw_raw_rect(ctx, rx0, ry0, rx1, ry1, 0x0000ff20);
+        double rx0 = p->sel_x0;
+        double ry0 = p->sel_y0;
+        double rx1 = p->x0;
+        double ry1 = p->y0;
+        if (rx0 > rx1) {
+            double tmp = rx1;
+            rx1 = rx0;
+            rx0 = tmp;
+        }
+        if (ry0 > ry1) {
+            double tmp = ry1;
+            ry1 = ry0;
+            ry0 = tmp;
+        }
+        if (rx1 > rx0 && ry1 > ry0)
+            draw_raw_rect(ctx, rx0, ry0, rx1, ry1, 0x0000ff20);
     }
 }
 
@@ -220,12 +220,12 @@ pe_view_draw(EventRef inEvent, pe_view_data *inData)
     CGContextRef ctx;
 
     err = GetEventParameter(inEvent, kEventParamCGContextRef, typeCGContextRef,
-			    NULL, sizeof(CGContextRef), NULL, &ctx);
+                            NULL, sizeof(CGContextRef), NULL, &ctx);
     require_noerr(err, ParameterMissing);
 
     if (inData->p) {
-	draw_plate(ctx, inData);
-	draw_selection(ctx, inData);
+        draw_plate(ctx, inData);
+        draw_selection(ctx, inData);
     }
 
  ParameterMissing:
@@ -244,21 +244,21 @@ pe_view_get_data(EventRef inEvent, pe_view_data *inData)
        and size match. Also, just returning a pe_view_data seems a
        little hacky. */
     err = GetEventParameter(inEvent, kEventParamControlDataTag, typeEnumeration,
-			    NULL, sizeof(OSType), NULL, &tag);
+                            NULL, sizeof(OSType), NULL, &tag);
     require_noerr(err, ParameterMissing);
 
     err = GetEventParameter(inEvent, kEventParamControlDataBuffer, typePtr,
-			    NULL, sizeof(Ptr), NULL, &ptr);
+                            NULL, sizeof(Ptr), NULL, &ptr);
 
     if (tag == kPEViewPrivate) {
-	*((pe_view_data **)ptr) = inData;
-	outSize = sizeof(pe_view_data *);
+        *((pe_view_data **)ptr) = inData;
+        outSize = sizeof(pe_view_data *);
     } else
-	err = errDataNotSupported;
+        err = errDataNotSupported;
 
     if (err == noErr)
-	err = SetEventParameter(inEvent, kEventParamControlDataBufferSize, typeLongInteger,
-				sizeof(Size), &outSize);
+        err = SetEventParameter(inEvent, kEventParamControlDataBufferSize, typeLongInteger,
+                                sizeof(Size), &outSize);
 
  ParameterMissing:
     return err;
@@ -272,17 +272,17 @@ pe_view_set_data(EventRef inEvent, pe_view_data *inData)
     OSType tag;
 
     err = GetEventParameter(inEvent, kEventParamControlDataTag, typeEnumeration,
-			    NULL, sizeof(OSType), NULL, &tag);
+                            NULL, sizeof(OSType), NULL, &tag);
     require_noerr(err, ParameterMissing);
 
     err = GetEventParameter(inEvent, kEventParamControlDataBuffer, typePtr,
-			    NULL, sizeof(Ptr), NULL, &ptr);
+                            NULL, sizeof(Ptr), NULL, &ptr);
     require_noerr(err, ParameterMissing);
 
     if (tag == 'Plat') {
-	inData->p = *(plate **)ptr;
+        inData->p = *(plate **)ptr;
     } else
-	err = errDataNotSupported;
+        err = errDataNotSupported;
 
  ParameterMissing:
     return err;
@@ -297,19 +297,19 @@ pe_view_hittest(EventRef inEvent, pe_view_data *inData)
     ControlPartCode part;
 
     err = GetEventParameter(inEvent, kEventParamMouseLocation, typeHIPoint,
-			    NULL, sizeof(HIPoint), NULL, &where);
+                            NULL, sizeof(HIPoint), NULL, &where);
     require_noerr(err, ParameterMissing);
 
     err = HIViewGetBounds(inData->view, &bounds);
     require_noerr(err, ParameterMissing);
 
     if (CGRectContainsPoint(bounds, where))
-	part = 1;
+        part = 1;
     else
-	part = kControlNoPart;
+        part = kControlNoPart;
     err = SetEventParameter(inEvent, kEventParamControlPart,
-			    typeControlPartCode, sizeof(ControlPartCode),
-			    &part);
+                            typeControlPartCode, sizeof(ControlPartCode),
+                            &part);
     printf("hittest %g, %g!\n", where.x, where.y);
 
  ParameterMissing:
@@ -335,9 +335,9 @@ static int
 pe_view_motion(pe_view_data *pe, double x, double y)
 {
     if (pe->p->motmode == MOTION_MODE_MOVE)
-	plate_motion_move(pe->p, x, y);
+        plate_motion_move(pe->p, x, y);
     else if (pe->p->motmode == MOTION_MODE_SELECT)
-	plate_motion_select(pe->p, x, y);
+        plate_motion_select(pe->p, x, y);
     pe_view_queue_draw(pe);
     return 1;
 }
@@ -352,7 +352,7 @@ pe_view_button_release(pe_view_data *pe)
     plate_unpress(pe->p);
 
     if (need_redraw)
-	pe_view_queue_draw(pe);
+        pe_view_queue_draw(pe);
     return 1;
 }
 
@@ -367,7 +367,7 @@ pe_view_track(EventRef inEvent, pe_view_data *inData)
     Point theQDPoint;
 
     err = GetEventParameter(inEvent, kEventParamMouseLocation, typeHIPoint,
-			    NULL, sizeof(HIPoint), NULL, &where);
+                            NULL, sizeof(HIPoint), NULL, &where);
     require_noerr(err, ParameterMissing);
 
     err = HIViewGetBounds(inData->view, &bounds);
@@ -382,18 +382,18 @@ pe_view_track(EventRef inEvent, pe_view_data *inData)
 
     mouseStatus = kMouseTrackingMouseDown;
     while (mouseStatus != kMouseTrackingMouseUp) {
-	TrackMouseLocation(NULL, &theQDPoint, &mouseStatus);
-	where.x = theQDPoint.h - windBounds.left;
-	where.y = theQDPoint.v - windBounds.top;
-	HIViewConvertPoint(&where, NULL, inData->view);
+        TrackMouseLocation(NULL, &theQDPoint, &mouseStatus);
+        where.x = theQDPoint.h - windBounds.left;
+        where.y = theQDPoint.v - windBounds.top;
+        HIViewConvertPoint(&where, NULL, inData->view);
 #ifdef VERBOSE
-	printf("track %d: %g, %g!\n", mouseStatus, where.x, where.y);
+        printf("track %d: %g, %g!\n", mouseStatus, where.x, where.y);
 #endif
-	if (mouseStatus == kMouseTrackingMouseUp) {
-	    pe_view_button_release(inData);
-	} else {
-	    pe_view_motion(inData, where.x, where.y);
-	}
+        if (mouseStatus == kMouseTrackingMouseUp) {
+            pe_view_button_release(inData);
+        } else {
+            pe_view_motion(inData, where.x, where.y);
+        }
     }
 
  ParameterMissing:
@@ -402,8 +402,8 @@ pe_view_track(EventRef inEvent, pe_view_data *inData)
 
 pascal OSStatus
 pe_view_handler(EventHandlerCallRef inCallRef,
-		EventRef inEvent,
-		void* inUserData )
+                EventRef inEvent,
+                void* inUserData )
 {
     OSStatus err = eventNotHandledErr;
     UInt32 eventClass = GetEventClass(inEvent);
@@ -412,41 +412,41 @@ pe_view_handler(EventHandlerCallRef inCallRef,
 
     switch (eventClass) {
     case kEventClassHIObject:
-	switch (eventKind) {
-	case kEventHIObjectConstruct:
-	    err = pe_view_construct(inEvent);
-	    break;
-	case kEventHIObjectInitialize:
-	    err = pe_view_initialize(inCallRef, inEvent, data);
-	    break;
-	case kEventHIObjectDestruct:
-	    err = pe_view_destruct(inEvent, data);
-	    break;
-	}
-	break;
+        switch (eventKind) {
+        case kEventHIObjectConstruct:
+            err = pe_view_construct(inEvent);
+            break;
+        case kEventHIObjectInitialize:
+            err = pe_view_initialize(inCallRef, inEvent, data);
+            break;
+        case kEventHIObjectDestruct:
+            err = pe_view_destruct(inEvent, data);
+            break;
+        }
+        break;
     case kEventClassControl:
-	switch (eventKind) {
-	case kEventControlInitialize:
-	    err = noErr;
-	    break;
-	case kEventControlDraw:
-	    err = pe_view_draw(inEvent, data);
-	    break;
-	case kEventControlGetData:
-	    err = pe_view_get_data(inEvent, data);
-	    break;
-	case kEventControlSetData:
-	    err = pe_view_set_data(inEvent, data);
-	    break;
-	case kEventControlTrack:
-	    err = pe_view_track(inEvent, data);
-	    break;
-	case kEventControlHitTest:
-	    err = pe_view_hittest(inEvent, data);
-	    break;
-	    /*...*/
-	}
-	break;
+        switch (eventKind) {
+        case kEventControlInitialize:
+            err = noErr;
+            break;
+        case kEventControlDraw:
+            err = pe_view_draw(inEvent, data);
+            break;
+        case kEventControlGetData:
+            err = pe_view_get_data(inEvent, data);
+            break;
+        case kEventControlSetData:
+            err = pe_view_set_data(inEvent, data);
+            break;
+        case kEventControlTrack:
+            err = pe_view_track(inEvent, data);
+            break;
+        case kEventControlHitTest:
+            err = pe_view_hittest(inEvent, data);
+            break;
+            /*...*/
+        }
+        break;
     }
     return err;
 }
@@ -458,37 +458,37 @@ pe_view_register(void)
     static HIObjectClassRef pe_view_ClassRef = NULL;
 
     if (pe_view_ClassRef == NULL) {
-	EventTypeSpec eventList[] = {
-	    { kEventClassHIObject, kEventHIObjectConstruct },
-	    { kEventClassHIObject, kEventHIObjectInitialize },
-	    { kEventClassHIObject, kEventHIObjectDestruct },
+        EventTypeSpec eventList[] = {
+            { kEventClassHIObject, kEventHIObjectConstruct },
+            { kEventClassHIObject, kEventHIObjectInitialize },
+            { kEventClassHIObject, kEventHIObjectDestruct },
 
-	    { kEventClassControl, kEventControlActivate },
-	    { kEventClassControl, kEventControlDeactivate },
-	    { kEventClassControl, kEventControlDraw },
-	    { kEventClassControl, kEventControlHiliteChanged },
-	    { kEventClassControl, kEventControlHitTest },
-	    { kEventClassControl, kEventControlInitialize },
-	    { kEventClassControl, kEventControlGetData },
-	    { kEventClassControl, kEventControlSetData },
-	    { kEventClassControl, kEventControlTrack }
-	};
-	err = HIObjectRegisterSubclass(kPEViewClassID,
-				       kHIViewClassID,
-				       NULL,
-				       pe_view_handler,
-				       GetEventTypeCount(eventList),
-				       eventList,
-				       NULL,
-				       &pe_view_ClassRef);
+            { kEventClassControl, kEventControlActivate },
+            { kEventClassControl, kEventControlDeactivate },
+            { kEventClassControl, kEventControlDraw },
+            { kEventClassControl, kEventControlHiliteChanged },
+            { kEventClassControl, kEventControlHitTest },
+            { kEventClassControl, kEventControlInitialize },
+            { kEventClassControl, kEventControlGetData },
+            { kEventClassControl, kEventControlSetData },
+            { kEventClassControl, kEventControlTrack }
+        };
+        err = HIObjectRegisterSubclass(kPEViewClassID,
+                                       kHIViewClassID,
+                                       NULL,
+                                       pe_view_handler,
+                                       GetEventTypeCount(eventList),
+                                       eventList,
+                                       NULL,
+                                       &pe_view_ClassRef);
     }
     return err;
 }
 
 OSStatus pe_view_create(
-	WindowRef			inWindow,
-	const HIRect*		inBounds,
-	HIViewRef*			outView)
+        WindowRef                       inWindow,
+        const HIRect*           inBounds,
+        HIViewRef*                      outView)
 {
     OSStatus err;
     EventRef event;
@@ -497,23 +497,23 @@ OSStatus pe_view_create(
     require_noerr(err, CantRegister);
 
     err = CreateEvent(NULL, kEventClassHIObject, kEventHIObjectInitialize,
-		      GetCurrentEventTime(), 0, &event);
+                      GetCurrentEventTime(), 0, &event);
     require_noerr(err, CantCreateEvent);
 
     if (inBounds != NULL) {
-	err = SetEventParameter(event, 'Boun', typeHIRect, sizeof(HIRect),
-				inBounds);
-	require_noerr(err, CantSetParameter);
+        err = SetEventParameter(event, 'Boun', typeHIRect, sizeof(HIRect),
+                                inBounds);
+        require_noerr(err, CantSetParameter);
     }
 
     err = HIObjectCreate(kPEViewClassID, event, (HIObjectRef*)outView);
     require_noerr(err, CantCreate);
 
     if (inWindow != NULL) {
-	HIViewRef root;
-	err = GetRootControl(inWindow, &root);
-	require_noerr(err, CantGetRootView);
-	err = HIViewAddSubview(root, *outView);
+        HIViewRef root;
+        err = GetRootControl(inWindow, &root);
+        require_noerr(err, CantGetRootView);
+        err = HIViewAddSubview(root, *outView);
     }
  CantCreate:
  CantGetRootView:

@@ -42,13 +42,13 @@ ans = *p++;
 i = N;
 
 do
-	ans = ans * x  +  *p++;
+        ans = ans * x  +  *p++;
 while( --i );
 
 return( ans );
 }
 
-/*							p1evl()	*/
+/*                                                      p1evl() */
 /*                                          N
  * Evaluate polynomial when coefficient of x  is 1.0.
  * Otherwise same as polevl.
@@ -65,7 +65,7 @@ ans = x + *p++;
 i = N-1;
 
 do
-	ans = ans * x  + *p++;
+        ans = ans * x  + *p++;
 while( --i );
 
 return( ans );
@@ -175,12 +175,12 @@ double x, x2;
 x = fabs(xxa);
 x2 = x * x;
 if( x2 < 2.5625 )
-	{
-	t = x2 * x2;
-	ss = x * x2 * polevl( t, sn, 5)/p1evl( t, sd, 6 );
-	cc = x * polevl( t, cn, 5)/polevl(t, cd, 6 );
-	goto done;
-	}
+        {
+        t = x2 * x2;
+        ss = x * x2 * polevl( t, sn, 5)/p1evl( t, sd, 6 );
+        cc = x * polevl( t, cn, 5)/polevl(t, cd, 6 );
+        goto done;
+        }
 
 
 
@@ -190,36 +190,36 @@ if( x2 < 2.5625 )
 /* Note by RLL: the cutoff here seems low to me; perhaps it should be
    eliminated altogether. */
 if( x > 36974.0 )
-	{
-	cc = 0.5;
-	ss = 0.5;
-	goto done;
-	}
+        {
+        cc = 0.5;
+        ss = 0.5;
+        goto done;
+        }
 #endif
 
-/*		Asymptotic power series auxiliary functions
- *		for large argument
+/*              Asymptotic power series auxiliary functions
+ *              for large argument
  */
-	x2 = x * x;
-	t = M_PI * x2;
-	u = 1.0/(t * t);
-	t = 1.0/t;
-	f = 1.0 - u * polevl( u, fn, 9)/p1evl(u, fd, 10);
-	g = t * polevl( u, gn, 10)/p1evl(u, gd, 11);
+        x2 = x * x;
+        t = M_PI * x2;
+        u = 1.0/(t * t);
+        t = 1.0/t;
+        f = 1.0 - u * polevl( u, fn, 9)/p1evl(u, fd, 10);
+        g = t * polevl( u, gn, 10)/p1evl(u, gd, 11);
 
-	t = M_PI_2 * x2;
-	c = cos(t);
-	s = sin(t);
-	t = M_PI * x;
-	cc = 0.5  +  (f * s  -  g * c)/t;
-	ss = 0.5  -  (f * c  +  g * s)/t;
+        t = M_PI_2 * x2;
+        c = cos(t);
+        s = sin(t);
+        t = M_PI * x;
+        cc = 0.5  +  (f * s  -  g * c)/t;
+        ss = 0.5  -  (f * c  +  g * s)/t;
 
 done:
 if( xxa < 0.0 )
-	{
-	cc = -cc;
-	ss = -ss;
-	}
+        {
+        cc = -cc;
+        ss = -ss;
+        }
 
 *cca = cc;
 *ssa = ss;
@@ -248,8 +248,8 @@ double mod_2pi(double th) {
 }
 
 void fit_cornu_half(double th0, double th1,
-		    double *pt0, double *pt1,
-		    double *pk0, double *pk1)
+                    double *pt0, double *pt1,
+                    double *pk0, double *pk1)
 {
     int i;
     const int max_iter = 21;
@@ -261,34 +261,34 @@ void fit_cornu_half(double th0, double th1,
        use something like Newton-Raphson. */
 
     if (fabs(th0 + th1) < 1e-6) {
-	th0 += 1e-6;
-	th1 += 1e-6;
+        th0 += 1e-6;
+        th1 += 1e-6;
     }
     t_est = 0.29112 * (th1 + th0) / sqrt(th1 - th0);
     tl = t_est * .9;
     tr = t_est * 2;
     for (i = 0; i < max_iter; i++) {
-	double dt;
-	double chord_th;
+        double dt;
+        double chord_th;
 
-	t_m = .5 * (tl + tr);
-	dt = (th0 + th1) / (4 * t_m);
-	t0 = t_m - dt;
-	t1 = t_m + dt;
-	eval_cornu(t0, &s0, &c0);
-	eval_cornu(t1, &s1, &c1);
-	chord_th = atan2(s1 - s0, c1 - c0);
-	if (mod_2pi(chord_th - t0 * t0 - th0) < 0)
-	    tl = t_m;
-	else
-	    tr = t_m;
+        t_m = .5 * (tl + tr);
+        dt = (th0 + th1) / (4 * t_m);
+        t0 = t_m - dt;
+        t1 = t_m + dt;
+        eval_cornu(t0, &s0, &c0);
+        eval_cornu(t1, &s1, &c1);
+        chord_th = atan2(s1 - s0, c1 - c0);
+        if (mod_2pi(chord_th - t0 * t0 - th0) < 0)
+            tl = t_m;
+        else
+            tr = t_m;
     }
     *pt0 = t0;
     *pt1 = t1;
     if (pk0 || pk1) {
-	double chordlen = hypot(s1 - s0, c1 - c0);
-	if (pk0) *pk0 = t0 * chordlen;
-	if (pk1) *pk1 = t1 * chordlen;
+        double chordlen = hypot(s1 - s0, c1 - c0);
+        if (pk0) *pk0 = t0 * chordlen;
+        if (pk1) *pk1 = t1 * chordlen;
     }
 }
 
@@ -302,29 +302,29 @@ est_cornu_error(double t0, double t1)
     double t, u, est;
 
     if (t0 < 0 || t1 < 0) {
-	t0 = -t0;
-	t1 = -t1;
+        t0 = -t0;
+        t1 = -t1;
     }
     if (t1 < 0) {
-	fprintf(stderr, "unexpected t1 sign\n");
+        fprintf(stderr, "unexpected t1 sign\n");
     }
     if (t1 < t0) {
-	double tmp = t0;
-	t0 = t1;
-	t1 = tmp;
+        double tmp = t0;
+        t0 = t1;
+        t1 = tmp;
     }
     if (fabs(t0) < 1e-9) {
-	est = t1 * t1 * t1;
-	est *= .017256 - .0059 - est * t1;
+        est = t1 * t1 * t1;
+        est *= .017256 - .0059 - est * t1;
     } else {
-	t = t1 - t0;
-	t *= t;
-	t *= t;
-	est = t * fabs(t0 + t1 - 1.22084) / (t0 + t1);
-	u = t0 + t1 + .6;
-	u = u * u * u;
-	est *= .014 * (.6 * u + 1);
-	est += t * (t1 - t0) * .004;
+        t = t1 - t0;
+        t *= t;
+        t *= t;
+        est = t * fabs(t0 + t1 - 1.22084) / (t0 + t1);
+        u = t0 + t1 + .6;
+        u = u * u * u;
+        est *= .014 * (.6 * u + 1);
+        est += t * (t1 - t0) * .004;
     }
     return est;
 }
@@ -355,8 +355,8 @@ affine_multiply(double dst[6], const double src1[6], const double src2[6])
 
 void
 fit_quadratic(double x0, double y0, double th0,
-	      double x1, double y1, double th1,
-	      double quad[6]) {
+              double x1, double y1, double th1,
+              double quad[6]) {
     double th;
     double s0, c0, s1, c1;
     double det, s, c;
@@ -397,26 +397,26 @@ cornu_seg_to_quad(double t0, double t1, const double aff[6], bezctx *bc)
 
 void
 cornu_seg_to_bpath(double t0, double t1, const double aff[6],
-		   bezctx *bc, double tol)
+                   bezctx *bc, double tol)
 {
     double tm;
 
     if ((t0 < 0 && t1 > 0) || (t1 < 0 && t0 > 0))
-	tm = 0;
+        tm = 0;
     else {
-	if (fabs(t0 * t0 - t1 * t1) < 1.5 &&
-	    est_cornu_error(t0, t1) < tol) {
-	    cornu_seg_to_quad(t0, t1, aff, bc);
-	    return;
-	}
+        if (fabs(t0 * t0 - t1 * t1) < 1.5 &&
+            est_cornu_error(t0, t1) < tol) {
+            cornu_seg_to_quad(t0, t1, aff, bc);
+            return;
+        }
 #if 0
-	if (fabs(t0 - t1) < 1e-6) {
-	  printf("DIVERGENCE!\007\n");
-	  return;
+        if (fabs(t0 - t1) < 1e-6) {
+          printf("DIVERGENCE!\007\n");
+          return;
 
-	}
+        }
 #endif
-	tm = (t0 + t1) * .5;
+        tm = (t0 + t1) * .5;
     }
 
     cornu_seg_to_bpath(t0, tm, aff, bc, tol);
@@ -425,59 +425,59 @@ cornu_seg_to_bpath(double t0, double t1, const double aff[6],
 
 void
 cornu_to_bpath(const double xs[], const double ys[], const double ths[], int n,
-	       bezctx *bc, double tol, int closed, int kt0, int n_kt)
+               bezctx *bc, double tol, int closed, int kt0, int n_kt)
 {
     int i;
 
     for (i = 0; i < n - 1 + closed; i++) {
-	double x0 = xs[i], y0 = ys[i];
-	int ip1 = (i + 1) % n;
-	double x1 = xs[ip1], y1 = ys[ip1];
-	double th = atan2(y1 - y0, x1 - x0);
-	double th0 = mod_2pi(ths[i] - th);
-	double th1 = mod_2pi(th - ths[ip1]);
-	double t0, t1;
-	double s0, c0, s1, c1;
-	double chord_th, chordlen, rot, scale;
-	double aff[6], aff2[6];
-	double flip = -1;
+        double x0 = xs[i], y0 = ys[i];
+        int ip1 = (i + 1) % n;
+        double x1 = xs[ip1], y1 = ys[ip1];
+        double th = atan2(y1 - y0, x1 - x0);
+        double th0 = mod_2pi(ths[i] - th);
+        double th1 = mod_2pi(th - ths[ip1]);
+        double t0, t1;
+        double s0, c0, s1, c1;
+        double chord_th, chordlen, rot, scale;
+        double aff[6], aff2[6];
+        double flip = -1;
 
-	th1 += 1e-6;
-	if (th1 < th0) {
-	    double tmp = th0;
-	    th0 = th1;
-	    th1 = tmp;
-	    flip = 1;
-	}
-	fit_cornu_half(th0, th1, &t0, &t1, NULL, NULL);
-	if (flip == 1) {
-	    double tmp = t0;
-	    t0 = t1;
-	    t1 = tmp;
-	}
-	eval_cornu(t0, &s0, &c0);
-	s0 *= flip;
-	eval_cornu(t1, &s1, &c1);
-	s1 *= flip;
-	chord_th = atan2(s1 - s0, c1 - c0);
-	chordlen = hypot(s1 - s0, c1 - c0);
-	rot = th - chord_th;
-	scale = hypot(y1 - y0, x1 - x0) / chordlen;
-	aff[0] = 1;
-	aff[1] = 0;
-	aff[2] = 0;
-	aff[3] = flip;
-	aff[4] = -c0;
-	aff[5] = -s0;
-	aff2[0] = scale * cos(rot);
-	aff2[1] = scale * sin(rot);
-	aff2[2] = -aff2[1];
-	aff2[3] = aff2[0];
-	aff2[4] = x0;
-	aff2[5] = y0;
-	affine_multiply(aff, aff, aff2);
-	bezctx_mark_knot(bc, (kt0 + i) % n_kt);
-	cornu_seg_to_bpath(t0, t1, aff, bc, tol / scale);
+        th1 += 1e-6;
+        if (th1 < th0) {
+            double tmp = th0;
+            th0 = th1;
+            th1 = tmp;
+            flip = 1;
+        }
+        fit_cornu_half(th0, th1, &t0, &t1, NULL, NULL);
+        if (flip == 1) {
+            double tmp = t0;
+            t0 = t1;
+            t1 = tmp;
+        }
+        eval_cornu(t0, &s0, &c0);
+        s0 *= flip;
+        eval_cornu(t1, &s1, &c1);
+        s1 *= flip;
+        chord_th = atan2(s1 - s0, c1 - c0);
+        chordlen = hypot(s1 - s0, c1 - c0);
+        rot = th - chord_th;
+        scale = hypot(y1 - y0, x1 - x0) / chordlen;
+        aff[0] = 1;
+        aff[1] = 0;
+        aff[2] = 0;
+        aff[3] = flip;
+        aff[4] = -c0;
+        aff[5] = -s0;
+        aff2[0] = scale * cos(rot);
+        aff2[1] = scale * sin(rot);
+        aff2[2] = -aff2[1];
+        aff2[3] = aff2[0];
+        aff2[4] = x0;
+        aff2[5] = y0;
+        affine_multiply(aff, aff, aff2);
+        bezctx_mark_knot(bc, (kt0 + i) % n_kt);
+        cornu_seg_to_bpath(t0, t1, aff, bc, tol / scale);
     }
 }
 
@@ -489,28 +489,28 @@ double fit_arc(double x, double y) {
 
 void
 local_ths(const double xs[], const double ys[], double ths[], int n,
-	  int closed)
+          int closed)
 {
     int i;
 
     for (i = 1 - closed; i < n - 1 + closed; i++) {
-	int im1 = (i + n - 1) % n;
-	double x0 = xs[im1];
-	double y0 = ys[im1];
-	double x1 = xs[i];
-	double y1 = ys[i];
-	int ip1 = (i + 1) % n;
-	double x2 = xs[ip1];
-	double y2 = ys[ip1];
-	double dx = x2 - x0;
-	double dy = y2 - y0;
-	double ir2 = dx * dx + dy * dy;
-	double x = ((x1 - x0) * dx + (y1 - y0) * dy) / ir2;
-	double y = ((y1 - y0) * dx - (x1 - x0) * dy) / ir2;
-	if (dx == 0.0 && dy == 0.0)
-	  ths[i] = 0.0;
-	else
-	  ths[i] = fit_arc(x, y) + atan2(dy, dx);
+        int im1 = (i + n - 1) % n;
+        double x0 = xs[im1];
+        double y0 = ys[im1];
+        double x1 = xs[i];
+        double y1 = ys[i];
+        int ip1 = (i + 1) % n;
+        double x2 = xs[ip1];
+        double y2 = ys[ip1];
+        double dx = x2 - x0;
+        double dy = y2 - y0;
+        double ir2 = dx * dx + dy * dy;
+        double x = ((x1 - x0) * dx + (y1 - y0) * dy) / ir2;
+        double y = ((y1 - y0) * dx - (x1 - x0) * dy) / ir2;
+        if (dx == 0.0 && dy == 0.0)
+          ths[i] = 0.0;
+        else
+          ths[i] = fit_arc(x, y) + atan2(dy, dx);
     }
 }
 
@@ -523,76 +523,76 @@ endpoint_ths(const double xs[], const double ys[], double ths[], int n)
 
 void
 tweak_ths(const double xs[], const double ys[], double ths[], int n,
-	  double delt, int closed)
+          double delt, int closed)
 {
     double *dks = (double *)malloc(sizeof(double) * n);
     int i;
     double first_k0, last_k1;
 
     for (i = 0; i < n - 1 + closed; i++) {
-	double x0 = xs[i];
-	double y0 = ys[i];
-	int ip1 = (i + 1) % n;
-	double x1 = xs[ip1];
-	double y1 = ys[ip1];
-	double th, th0, th1;
-	double t0, t1, k0, k1;
-	double s0, c0, s1, c1;
-	double scale;
-	double flip = -1;
+        double x0 = xs[i];
+        double y0 = ys[i];
+        int ip1 = (i + 1) % n;
+        double x1 = xs[ip1];
+        double y1 = ys[ip1];
+        double th, th0, th1;
+        double t0, t1, k0, k1;
+        double s0, c0, s1, c1;
+        double scale;
+        double flip = -1;
 
-	if (x0 == x1 && y0 == y1) {
+        if (x0 == x1 && y0 == y1) {
 #ifdef VERBOSE
-	  printf("Overlapping points (i=%d)\n", i);
+          printf("Overlapping points (i=%d)\n", i);
 #endif
-	  /* Very naughty, casting off the constness like this. */
-	  ((double*) xs)[i] = x1 = x1 + 1e-6;
-	}
+          /* Very naughty, casting off the constness like this. */
+          ((double*) xs)[i] = x1 = x1 + 1e-6;
+        }
 
-	th = atan2(y1 - y0, x1 - x0);
-	th0 = mod_2pi(ths[i] - th);
-	th1 = mod_2pi(th - ths[ip1]);
+        th = atan2(y1 - y0, x1 - x0);
+        th0 = mod_2pi(ths[i] - th);
+        th1 = mod_2pi(th - ths[ip1]);
 
-	th1 += 1e-6;
-	if (th1 < th0) {
-	    double tmp = th0;
-	    th0 = th1;
-	    th1 = tmp;
-	    flip = 1;
-	}
-	fit_cornu_half(th0, th1, &t0, &t1, &k0, &k1);
-	if (flip == 1) {
-	    double tmp = t0;
-	    t0 = t1;
-	    t1 = tmp;
+        th1 += 1e-6;
+        if (th1 < th0) {
+            double tmp = th0;
+            th0 = th1;
+            th1 = tmp;
+            flip = 1;
+        }
+        fit_cornu_half(th0, th1, &t0, &t1, &k0, &k1);
+        if (flip == 1) {
+            double tmp = t0;
+            t0 = t1;
+            t1 = tmp;
 
-	    tmp = k0;
-	    k0 = k1;
-	    k1 = tmp;
-	}
-	eval_cornu(t0, &s0, &c0);
-	eval_cornu(t1, &s1, &c1);
-	scale = 1 / hypot(y1 - y0, x1 - x0);
-	k0 *= scale;
-	k1 *= scale;
-	if (i > 0) dks[i] = k0 - last_k1;
-	else first_k0 = k0;
-	last_k1 = k1;
+            tmp = k0;
+            k0 = k1;
+            k1 = tmp;
+        }
+        eval_cornu(t0, &s0, &c0);
+        eval_cornu(t1, &s1, &c1);
+        scale = 1 / hypot(y1 - y0, x1 - x0);
+        k0 *= scale;
+        k1 *= scale;
+        if (i > 0) dks[i] = k0 - last_k1;
+        else first_k0 = k0;
+        last_k1 = k1;
     }
     if (closed)
       dks[0] = first_k0 - last_k1;
     for (i = 1 - closed; i < n - 1 + closed; i++) {
-	int im1 = (i + n - 1) % n;
-	double x0 = xs[im1];
-	double y0 = ys[im1];
-	double x1 = xs[i];
-	double y1 = ys[i];
-	int ip1 = (i + 1) % n;
-	double x2 = xs[ip1];
-	double y2 = ys[ip1];
-	double chord1 = hypot(x1 - x0, y1 - y0);
-	double chord2 = hypot(x2 - x1, y2 - y1);
-	ths[i] -= delt * dks[i] * chord1 * chord2 / (chord1 + chord2);
+        int im1 = (i + n - 1) % n;
+        double x0 = xs[im1];
+        double y0 = ys[im1];
+        double x1 = xs[i];
+        double y1 = ys[i];
+        int ip1 = (i + 1) % n;
+        double x2 = xs[ip1];
+        double y2 = ys[ip1];
+        double chord1 = hypot(x1 - x0, y1 - y0);
+        double chord2 = hypot(x2 - x1, y2 - y1);
+        ths[i] -= delt * dks[i] * chord1 * chord2 / (chord1 + chord2);
     }
     free(dks);
 }
@@ -602,10 +602,10 @@ void test_cornu(void)
 #if 0
     int i;
     for (i = -10; i < 100; i++) {
-	double t = 36974 * 1.2533141373155 + i * .1;
-	double s, c;
-	eval_cornu(t, &s, &c);
-	printf("%g %g %g\n", t, s, c);
+        double t = 36974 * 1.2533141373155 + i * .1;
+        double s, c;
+        eval_cornu(t, &s, &c);
+        printf("%g %g %g\n", t, s, c);
     }
 #else
     double t0, t1;
